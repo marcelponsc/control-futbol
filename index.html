@@ -44,9 +44,9 @@
             </div>
             <div class="mt-4 border-t border-slate-850 pt-3 text-center">
                 <p class="text-[10px] text-slate-500 leading-normal">
-                    <b>Credencials actives per a proves:</b><br>
-                    Coordinador: <span class="text-slate-400">coordinador@club.com</span><br>
-                    Entrenador Grup A: <span class="text-slate-400">entrenadorA@club.com</span> (Clau: 1234)
+                    <b>Credencials del sistema:</b><br>
+                    Coordinador global: <span class="text-slate-400 font-mono">coordinador@club.com</span> (Clau: 1234)<br>
+                    <span class="text-slate-500">Els nous comptes de professors es creen des de la pestanya Configuració.</span>
                 </p>
             </div>
         </div>
@@ -61,7 +61,7 @@
             </div>
             
             <div id="wrapper-selector-equips" class="hidden flex items-center space-x-2 bg-slate-950 px-2 py-1 rounded-xl border border-slate-850">
-                <label class="text-[10px] uppercase tracking-wider font-bold text-slate-500"><i class="fas fa-filter mr-1"></i>Grup:</label>
+                <label class="text-[10px] uppercase tracking-wider font-bold text-slate-500"><i class="fas fa-filter mr-1"></i>Grup actiu:</label>
                 <select id="selector-equip-coordinador" onchange="canviarEquipActiuCoordinador(this.value)" class="bg-transparent text-xs font-bold text-indigo-400 focus:outline-none cursor-pointer"></select>
             </div>
 
@@ -122,12 +122,12 @@
             <section id="seccion-ejercicios" class="seccion-oculta grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
                 
                 <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3 shadow-sm md:sticky md:top-4">
-                    <h3 class="font-black text-white text-xs uppercase tracking-wider border-b border-slate-850 pb-1.5"><i class="fas fa-plus-circle text-indigo-400 mr-1.5"></i>Pujar Nova Tasca Coeducativa</h3>
+                    <h3 class="font-black text-white text-xs uppercase tracking-wider border-b border-slate-850 pb-1.5"><i class="fas fa-plus-circle text-indigo-400 mr-1.5"></i>Pujar Nova Tasca</h3>
                     
                     <div class="space-y-2.5 text-xs">
                         <div>
                             <label class="block text-slate-400 font-medium mb-1">Nom de la tasca / joc</label>
-                            <input id="task-nombre" type="text" placeholder="Ex: Rondo de passades adaptat" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1.5 text-white focus:outline-none focus:border-indigo-500 text-xs">
+                            <input id="task-nombre" type="text" placeholder="Ex: Rondo adaptat" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1.5 text-white focus:outline-none focus:border-indigo-500 text-xs">
                         </div>
                         <div class="grid grid-cols-2 gap-2">
                             <div>
@@ -141,13 +141,13 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-slate-400 font-medium mb-1">Esquema o Gràfic</label>
+                                <label class="block text-slate-400 font-medium mb-1">Imatge / Foto Esquema</label>
                                 <input id="task-arxiu-imatge" type="file" accept="image/*" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-2 py-1 text-slate-400 text-[10px] focus:outline-none file:mr-2 file:py-0.5 file:px-1.5 file:rounded file:border-0 file:text-[10px] file:font-semibold file:bg-indigo-950 file:text-indigo-400 cursor-pointer">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-slate-400 font-medium mb-1">Instruccions i regles de provocació</label>
-                            <textarea id="task-explicacion" rows="3" placeholder="Explica l'organització de l'espai, el material necessari i les condicions del joc..." class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1.5 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 text-xs leading-relaxed"></textarea>
+                            <label class="block text-slate-400 font-medium mb-1">Instruccions de la tasca</label>
+                            <textarea id="task-explicacion" rows="3" placeholder="Explica l'organització, material i condicions del joc..." class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1.5 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 text-xs leading-relaxed"></textarea>
                         </div>
                         <button id="btn-pujar-tasca" onclick="crearEjercicioFirebase()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-xl text-xs transition cursor-pointer flex items-center justify-center gap-1.5 shadow">
                             <i class="fas fa-cloud-upload-alt"></i> Desar a la Comunitat
@@ -189,8 +189,7 @@
                         </div>
 
                         <div class="border-t border-slate-850/60 pt-2 space-y-1.5">
-                            <label class="block text-slate-500 font-bold text-[10px] uppercase tracking-wider mb-1">Cronograma de tasques estructurades</label>
-                            
+                            <label class="block text-slate-500 font-bold text-[10px] uppercase tracking-wider mb-1">Cronograma de tasques</label>
                             <div class="space-y-1.5">
                                 <div class="grid grid-cols-3 gap-1">
                                     <select id="slot-1-filter" onchange="filtrarSelectorSlotDinamic(1)" class="bg-slate-950 border border-slate-850 rounded-lg text-[11px] p-1 text-slate-400 focus:outline-none cursor-pointer"></select>
@@ -216,11 +215,11 @@
                         </div>
 
                         <div>
-                            <label class="block text-slate-400 font-medium mb-1">Notes de Material / Atenció a la Diversitat</label>
-                            <input id="entreno-notes" type="text" placeholder="Ex: Adaptar espai per a l'alumne X..." class="w-full bg-slate-950 border border-slate-850 rounded-xl px-2.5 py-1.5 text-white text-xs focus:outline-none">
+                            <label class="block text-slate-400 font-medium mb-1">Notes de Material</label>
+                            <input id="entreno-notes" type="text" placeholder="Ex: Cons, petos de colors..." class="w-full bg-slate-950 border border-slate-850 rounded-xl px-2.5 py-1.5 text-white text-xs focus:outline-none">
                         </div>
                         <button onclick="crearEntrenamiento()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-xl text-xs transition cursor-pointer shadow">
-                            Guardar i Pujar lliçó
+                            Guardar Sessió
                         </button>
                     </div>
                 </div>
@@ -241,26 +240,23 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
-                    
                     <div class="lg:col-span-2 space-y-3">
-                        <h3 class="font-black text-white text-xs uppercase tracking-wider text-slate-400"><i class="fas fa-stream text-indigo-400 mr-1.5"></i>Estructura Pràctica de la lliçó</h3>
+                        <h3 class="font-black text-white text-xs uppercase tracking-wider text-slate-400"><i class="fas fa-stream text-indigo-400 mr-1.5"></i>Estructura Pràctica</h3>
                         <div id="det-entreno-lista-tasques" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
                     </div>
 
                     <div class="bg-slate-900 border border-slate-800 p-3 rounded-2xl space-y-3 shadow-md lg:sticky lg:top-4">
                         <div class="flex justify-between items-center border-b border-slate-850 pb-2">
                             <h3 class="font-black text-white text-xs uppercase tracking-wider flex items-center gap-1.5"><i class="fas fa-check-square text-teal-400"></i>Control d'Assistència</h3>
-                            <span class="text-[10px] text-slate-500 font-mono">P: Present | A: Absent | J: Justificat</span>
+                            <span class="text-[10px] text-slate-500 font-mono">P/A/J</span>
                         </div>
-                        
                         <div class="max-h-[380px] overflow-y-auto border border-slate-850 rounded-xl bg-slate-950/50">
                             <table class="w-full text-xs">
                                 <tbody id="tabla-asistencia-sesion-interna"></tbody>
                             </table>
                         </div>
-
                         <button onclick="desarAsistenciaSessióActual()" class="w-full bg-teal-600 hover:bg-teal-500 text-white font-black py-2 rounded-xl text-xs transition cursor-pointer shadow-md mt-1">
-                            <i class="fas fa-save mr-1"></i> Confirmar i Desar Assistència
+                            <i class="fas fa-save mr-1"></i> Desar Canvis d'Assistència
                         </button>
                     </div>
                 </div>
@@ -276,11 +272,10 @@
                         </div>
                         <div class="grid grid-cols-2 gap-2">
                             <div>
-                                <label class="block text-slate-400 font-medium mb-1">Camp / Pista</label>
+                                <label class="block text-slate-400 font-medium mb-1">Pista / Camp</label>
                                 <select id="partido-campo" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-2 py-1.5 text-white text-xs cursor-pointer">
                                     <option value="Camp Local">Pista Coberta</option>
                                     <option value="Camp Visitant">Camp Exterior</option>
-                                    <option value="Pavelló Municipal">Pavelló Municipal</option>
                                 </select>
                             </div>
                             <div>
@@ -289,17 +284,17 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-slate-400 font-medium mb-1">Hora d'Inici</label>
+                            <label class="block text-slate-400 font-medium mb-1">Hora</label>
                             <input id="partido-hora" type="time" value="09:00" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1 text-white text-xs focus:outline-none">
                         </div>
                         <button onclick="crearPartidoRapido()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-xl text-xs transition cursor-pointer shadow">
-                            Obrir Nova Acta de Partit
+                            Obrir Nova Acta
                         </button>
                     </div>
                 </div>
 
                 <div class="md:col-span-2 space-y-3">
-                    <h3 class="font-black text-white text-sm uppercase tracking-wider border-b border-slate-900 pb-2">Historial d'Actes de Joc</h3>
+                    <h3 class="font-black text-white text-sm uppercase tracking-wider border-b border-slate-900 pb-2">Historial d'Actes</h3>
                     <div id="lista-partidos" class="space-y-2"></div>
                 </div>
             </section>
@@ -309,15 +304,14 @@
                     <button onclick="cambiarPestana('partidos')" class="bg-slate-900 border border-slate-800 hover:text-white px-2.5 py-1.5 rounded-xl text-xs transition cursor-pointer"><i class="fas fa-chevron-left"></i> Tornar</button>
                     <div>
                         <h2 id="det-partido-rival" class="text-base font-black text-white">vs Rival</h2>
-                        <p id="det-partido-info" class="text-xs text-slate-400">Informació general del matx</p>
+                        <p id="det-partido-info" class="text-xs text-slate-400">Informació del partit</p>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
-                    
                     <div class="lg:col-span-2 space-y-3">
                         <div class="flex justify-between items-center bg-slate-900/60 px-3 py-2 rounded-xl border border-slate-850">
-                            <span class="font-black text-white text-xs uppercase tracking-wider"><i class="fas fa-clipboard-check text-indigo-400 mr-1.5"></i>Control d'Acta de l'Alumnat</span>
+                            <span class="font-black text-white text-xs uppercase tracking-wider"><i class="fas fa-clipboard-check text-indigo-400 mr-1.5"></i>Control de l'Alumnat Convocat</span>
                             <div class="flex items-center space-x-2 font-mono text-xs font-black">
                                 <span class="text-indigo-400 bg-slate-950 border border-slate-800 px-2 py-0.5 rounded" id="acta-gols-nostres">0</span>
                                 <span class="text-slate-600">-</span>
@@ -325,52 +319,46 @@
                             </div>
                         </div>
                         <div id="lista-convocatoria-check" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
-                        
                         <div>
-                            <label class="block text-slate-400 font-medium text-xs mb-1">Anotacions post-partit de l'Acta / Valoració Didàctica</label>
-                            <textarea id="acta-valoracion" rows="2" oninput="let p=DB_PARTITS.find(x=>x.id===partitIdActualGestio); if(p){p.valoracio=this.value; localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS));}" placeholder="Escriu aspectes de millora, valors de joc net detectats, comportament..." class="w-full bg-slate-900 border border-slate-850 rounded-xl px-3 py-1.5 text-white text-xs focus:outline-none focus:border-indigo-500 leading-relaxed"></textarea>
+                            <label class="block text-slate-400 font-medium text-xs mb-1">Anotacions post-partit / Valoració Didàctica</label>
+                            <textarea id="acta-valoracion" rows="2" oninput="let p=DB_PARTITS.find(x=>x.id===partitIdActualGestio); if(p){p.valoracio=this.value; localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS));}" placeholder="Observacions del comportament, valors de joc net..." class="w-full bg-slate-900 border border-slate-850 rounded-xl px-3 py-1.5 text-white text-xs focus:outline-none focus:border-indigo-500 leading-relaxed"></textarea>
                         </div>
                     </div>
 
                     <div class="bg-slate-900 border border-slate-800 p-3 rounded-2xl space-y-3 shadow-md lg:sticky lg:top-4">
                         <div class="border-b border-slate-850 pb-2">
-                            <h3 class="font-black text-white text-xs uppercase tracking-wider flex items-center gap-1.5"><i class="fas fa-history text-teal-400"></i>Cronograma de Canvis (Futbol 7)</h3>
+                            <h3 class="font-black text-white text-xs uppercase tracking-wider flex items-center gap-1.5"><i class="fas fa-history text-teal-400"></i>Cronograma de Canvis (F7)</h3>
                         </div>
-
                         <div class="grid grid-cols-4 gap-1">
                             <button id="btn-q-2" onclick="seleccionarQuartFitxa(2)" class="py-1 bg-teal-600 text-white font-mono font-bold text-xs rounded border border-teal-500 shadow-sm cursor-pointer">Q2</button>
                             <button id="btn-q-3" onclick="seleccionarQuartFitxa(3)" class="py-1 bg-slate-800 text-slate-400 font-mono font-bold text-xs rounded border border-slate-700 cursor-pointer">Q3</button>
                             <button id="btn-q-4" onclick="seleccionarQuartFitxa(4)" class="py-1 bg-slate-800 text-slate-400 font-mono font-bold text-xs rounded border border-slate-700 cursor-pointer">Q4</button>
                             <button id="btn-q-int4" onclick="seleccionarQuartFitxa('int4')" class="py-1 bg-slate-800 text-slate-400 font-mono font-bold text-xs rounded border border-slate-700 cursor-pointer">Min</button>
                         </div>
-
                         <div id="wrapper-minuto-q4" class="seccion-oculta bg-slate-950 p-2 border border-slate-850 rounded-xl flex items-center justify-between text-xs">
-                            <span class="text-slate-400 font-medium">Especifica el Minut de joc (1-48):</span>
+                            <span class="text-slate-400 font-medium">Especifica el Minut (1-48):</span>
                             <input type="number" id="cambio-minuto-real" value="42" min="1" max="48" class="w-12 bg-slate-900 border border-slate-800 rounded font-mono p-0.5 text-center text-white focus:outline-none">
                         </div>
-
                         <div class="bg-slate-950 p-2.5 border border-slate-850 rounded-xl space-y-2 text-xs">
                             <input type="hidden" id="cambio-quarto-actiu" value="2">
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
-                                    <label class="block text-slate-500 font-bold text-[10px] uppercase mb-0.5">Surt del Camp ❌</label>
+                                    <label class="block text-slate-500 font-bold text-[10px] uppercase mb-0.5">Surt ❌</label>
                                     <select id="cambio-sale-select" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1 text-white focus:outline-none cursor-pointer"></select>
                                 </div>
                                 <div>
-                                    <label class="block text-slate-500 font-bold text-[10px] uppercase mb-0.5">Entra al Camp ✅</label>
+                                    <label class="block text-slate-500 font-bold text-[10px] uppercase mb-0.5">Entra ✅</label>
                                     <select id="cambio-entra-select" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1 text-white focus:outline-none cursor-pointer"></select>
                                 </div>
                             </div>
                             <button onclick="afegirSubstitucioCronologica()" class="w-full bg-slate-800 hover:bg-slate-700 text-teal-400 font-bold py-1.5 rounded-lg border border-slate-700/60 tracking-wide text-[11px] cursor-pointer transition">
-                                <i class="fas fa-plus mr-1"></i> Registrar Rotació a l'Acta
+                                <i class="fas fa-plus mr-1"></i> Registrar Rotació
                             </button>
                         </div>
-
                         <div class="space-y-1">
-                            <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Historial de canvis d'aquesta acta:</span>
+                            <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Historial de canvis:</span>
                             <div id="historial-cambios-linea" class="max-h-[140px] overflow-y-auto space-y-1 pr-1"></div>
                         </div>
-
                         <div id="tactical-canvas-container" class="hidden"></div>
                     </div>
                 </div>
@@ -422,26 +410,60 @@
                 </div>
             </section>
 
-            <section id="seccion-configuracion" class="seccion-oculta max-w-md mx-auto bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-4 shadow-sm">
-                <h3 class="font-black text-white text-xs uppercase tracking-wider border-b border-slate-850 pb-1.5"><i class="fas fa-sliders-h text-indigo-400 mr-1.5"></i>Configuració del Quadern</h3>
-                
-                <div class="space-y-3 text-xs">
-                    <div>
-                        <label class="block text-slate-400 font-medium mb-1">Nom de l'Institut o Entitat</label>
-                        <input id="cfg-nom-club" type="text" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1.5 text-white focus:outline-none text-xs">
+            <section id="seccion-configuracion" class="seccion-oculta space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                    <div class="flex items-center space-x-3 border-b border-slate-850 pb-3">
+                        <div class="w-8 h-8 bg-indigo-950 border border-indigo-800 rounded-lg flex items-center justify-center text-indigo-400"><i class="fas fa-school text-sm"></i></div>
+                        <div>
+                            <h3 class="text-sm font-black text-white">IDENTITAT DEL CENTRE</h3>
+                            <p class="text-[11px] text-slate-500">Nom principal de la institució escolar</p>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-slate-400 font-medium mb-1">Nom del Grup A (1r ESO)</label>
-                        <input id="cfg-nom-equip-a" type="text" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1.5 text-white focus:outline-none text-xs">
+                    <div class="space-y-3 text-xs">
+                        <div>
+                            <label class="block text-slate-400 font-medium mb-1">Nom de l'Entitat / Institut</label>
+                            <input type="text" id="cfg-nom-club" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:outline-none focus:border-indigo-500 font-medium">
+                        </div>
+                        <button onclick="actualitzarConfiguracioEntitat()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-xl transition cursor-pointer w-full text-xs shadow">
+                            <i class="fas fa-save mr-1"></i> Desar Nom de Centre
+                        </button>
                     </div>
-                    <div>
-                        <label class="block text-slate-400 font-medium mb-1">Nom del Grup B (1r ESO)</label>
-                        <input id="cfg-nom-equip-b" type="text" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1.5 text-white focus:outline-none text-xs">
+                </div>
+
+                <div id="cfg-panell-coordinador-equips" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                    <div class="flex items-center space-x-3 border-b border-slate-850 pb-3">
+                        <div class="w-8 h-8 bg-teal-950 border border-teal-800 rounded-lg flex items-center justify-center text-teal-400"><i class="fas fa-users-cog text-sm"></i></div>
+                        <div>
+                            <h3 class="text-sm font-black text-white">PANEL DE GESTIÓ D'EQUIPS (COORDINADOR)</h3>
+                            <p class="text-[11px] text-slate-500">Crea nous grups o equips amb el seu propi accés personalitzat</p>
+                        </div>
                     </div>
                     
-                    <button onclick="actualitzarConfiguracioEntitat()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-xl text-xs transition cursor-pointer shadow mt-2">
-                        <i class="fas fa-save mr-1.5"></i> Desar Paràmetres del Centre
-                    </button>
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-850 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                        <div class="md:col-span-3"><span class="text-[10px] font-bold text-teal-400 uppercase tracking-wider">Registrar Nou Equip i Usuari</span></div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">Nom de l'Equip / Curs</label>
+                            <input type="text" id="cfg-nou-equip-nom" placeholder="Ex: 1r ESO - Grup C" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-teal-500">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">Email de l'Entrenador / Tutor</label>
+                            <input type="email" id="cfg-nou-equip-email" placeholder="entrenadorC@club.com" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-teal-500">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">Contrasenya d'Accés</label>
+                            <input type="password" id="cfg-nou-equip-pass" placeholder="****" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-teal-500">
+                        </div>
+                        <div class="md:col-span-3 pt-2">
+                            <button onclick="crearEquipIDosierDinamic()" class="bg-teal-600 hover:bg-teal-500 text-white font-bold px-4 py-2 rounded-lg transition cursor-pointer w-full text-xs">
+                                <i class="fas fa-plus-circle mr-1"></i> Donar d'Alta Equip i Usuari
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 pt-2">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Equips / Grups Actius al Sistema</span>
+                        <div id="cfg-llista-equips-sistema" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
+                    </div>
                 </div>
             </section>
         </main>
@@ -451,7 +473,6 @@
         <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl max-w-sm w-full space-y-3 shadow-2xl">
             <h3 class="font-black text-white text-xs uppercase tracking-wider border-b border-slate-850 pb-1.5"><i class="fas fa-id-card text-indigo-400 mr-1.5"></i>Fitxa de dades individuals</h3>
             <input type="hidden" id="player-id-edicio">
-            
             <div class="space-y-2 text-xs">
                 <div>
                     <label class="block text-slate-400 font-medium mb-1">Cognoms i Nom de l'alumne</label>
@@ -463,7 +484,7 @@
                         <input id="player-dorsal" type="number" placeholder="Ex: 14" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1.5 text-white focus:outline-none text-xs">
                     </div>
                     <div>
-                        <label class="block text-slate-400 font-medium mb-1">Perfil Motor / Lateralitat</label>
+                        <label class="block text-slate-400 font-medium mb-1">Perfil / Lateralitat</label>
                         <select id="player-lateral" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-2 py-1.5 text-white text-xs cursor-pointer">
                             <option value="Dretà">Dretà (Predom. Dret)</option>
                             <option value="Esquerrà">Esquerrà (Predom. Esquerre)</option>
@@ -472,8 +493,8 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-slate-400 font-medium mb-1">Rol de joc preferent / Nivell inicial</label>
-                    <input id="player-p1" type="text" placeholder="Ex: Defensor / Alt rendiment" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1.5 text-white focus:outline-none text-xs">
+                    <label class="block text-slate-400 font-medium mb-1">Rol / Nivell inicial</label>
+                    <input id="player-p1" type="text" placeholder="Ex: Pivot / Alt rendiment" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1.5 text-white focus:outline-none text-xs">
                 </div>
                 <div class="grid grid-cols-2 gap-2 border-t border-slate-850 pt-2">
                     <div>
@@ -486,7 +507,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="grid grid-cols-2 gap-2 pt-2 text-xs font-bold">
                 <button onclick="tancarModalJugador()" class="bg-slate-800 hover:bg-slate-750 text-slate-400 py-2 rounded-xl transition cursor-pointer">Cancel·lar</button>
                 <button onclick="guardarJugador()" class="bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-xl transition cursor-pointer shadow">Desar Fitxa</button>
@@ -497,32 +517,26 @@
     <div id="modal-fitxa-jugador" class="seccion-oculta fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
         <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl max-w-sm w-full space-y-4 shadow-2xl relative">
             <button onclick="tancarFitxaJugador()" class="absolute top-3 right-3 text-slate-500 hover:text-white transition cursor-pointer"><i class="fas fa-times-circle text-base"></i></button>
-            
             <div class="text-center space-y-1">
                 <div class="w-12 h-12 bg-indigo-950 border border-indigo-900 rounded-full flex items-center justify-center text-indigo-400 text-lg font-bold mx-auto shadow-inner"><i class="fas fa-user-graduate"></i></div>
                 <h3 id="fitxa-nom" class="font-black text-white text-base tracking-tight pt-1">Cognoms, Nom</h3>
                 <span id="fitxa-dorsal" class="inline-block bg-slate-950 border border-slate-850 font-mono text-[10px] px-2 py-0.5 rounded text-indigo-400 font-bold">#00</span>
             </div>
-
             <div class="bg-slate-950 border border-slate-850 p-2.5 rounded-xl space-y-1.5 text-xs">
                 <div class="flex justify-between border-b border-slate-900 pb-1"><span class="text-slate-500">Perfil:</span> <span id="fitxa-p1" class="font-bold text-white">Sense dades</span></div>
                 <div class="flex justify-between"><span class="text-slate-500">Lateralitat:</span> <span id="fitxa-lateral" class="font-bold text-white">Sense dades</span></div>
             </div>
-
             <div class="space-y-2 border-t border-slate-850 pt-2.5">
                 <span class="block text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1"><i class="fas fa-phone-alt"></i> Canals de Comunicació de Família</span>
-                
                 <div class="flex items-center justify-between bg-slate-950/40 p-2 rounded-xl border border-slate-850/60 gap-2">
                     <p id="fitxa-text-pare" class="text-xs text-slate-300 truncate"></p>
                     <div id="fitxa-accions-pare" class="flex space-x-1 shrink-0"></div>
                 </div>
-
                 <div class="flex items-center justify-between bg-slate-950/40 p-2 rounded-xl border border-slate-850/60 gap-2">
                     <p id="fitxa-text-mare" class="text-xs text-slate-300 truncate"></p>
                     <div id="fitxa-accions-mare" class="flex space-x-1 shrink-0"></div>
                 </div>
             </div>
-
             <div class="grid grid-cols-2 gap-2 pt-1 text-[11px] font-bold border-t border-slate-850/60 pt-2.5">
                 <button id="btn-fitxa-eliminar" class="bg-slate-950 border border-slate-850 text-rose-400 py-1.5 rounded-xl hover:bg-rose-950/20 cursor-pointer transition"><i class="fas fa-trash-alt mr-1"></i>Baixa Alumne</button>
                 <button id="btn-fitxa-editar" class="bg-slate-800 text-white py-1.5 rounded-xl hover:bg-slate-700 cursor-pointer transition"><i class="fas fa-edit mr-1"></i>Modificar Fitxa</button>
