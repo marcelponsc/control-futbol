@@ -15,6 +15,14 @@
         ::-webkit-scrollbar-track { background: #020617; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #334155; }
+        .campo-futbol {
+            background-color: #164e21; border: 2px solid #ffffff30; position: relative;
+            background-image: linear-gradient(to bottom, transparent 49.5%, #ffffff30 49.5%, #ffffff30 50.5%, transparent 50.5%), radial-gradient(circle at 50% 50%, transparent 12%, #ffffff30 12%, #ffffff30 13%, transparent 13%);
+            background-size: 100% 100%;
+        }
+        .area-top, .area-bottom { position: absolute; left: 20%; right: 20%; height: 14%; pointer-events: none; }
+        .area-top { top: 0; border-bottom: 2px solid #ffffff25; border-left: 2px solid #ffffff25; border-right: 2px solid #ffffff25; }
+        .area-bottom { bottom: 0; border-top: 2px solid #ffffff25; border-left: 2px solid #ffffff25; border-right: 2px solid #ffffff25; }
     </style>
 </head>
 <body class="h-full flex flex-col font-sans antialiased text-sm select-none">
@@ -53,42 +61,25 @@
     </div>
 
     <div id="interficie-app" class="seccion-oculta flex flex-col h-full">
-        
         <header class="bg-slate-900 border-b border-slate-850 px-4 py-2.5 flex justify-between items-center shrink-0">
             <div class="flex items-center space-x-3">
                 <span id="nav-nom-club" class="font-black tracking-wider text-sm text-white">CENTRE</span>
                 <span id="badge-rol-usuari" class="bg-slate-950 border border-slate-800 text-slate-400 font-mono text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">ROL</span>
             </div>
-            
             <div id="wrapper-selector-equips" class="hidden flex items-center space-x-2 bg-slate-950 px-2 py-1 rounded-xl border border-slate-850">
                 <label class="text-[10px] uppercase tracking-wider font-bold text-slate-500"><i class="fas fa-filter mr-1"></i>Grup actiu:</label>
                 <select id="selector-equip-coordinador" onchange="canviarEquipActiuCoordinador(this.value)" class="bg-transparent text-xs font-bold text-indigo-400 focus:outline-none cursor-pointer"></select>
             </div>
-
-            <button onclick="executarLogout()" class="text-slate-500 hover:text-rose-400 text-xs p-1.5 transition cursor-pointer">
-                <i class="fas fa-sign-out-alt"></i>
-            </button>
+            <button onclick="executarLogout()" class="text-slate-500 hover:text-rose-400 text-xs p-1.5 transition cursor-pointer"><i class="fas fa-sign-out-alt"></i></button>
         </header>
 
         <nav class="bg-slate-900/60 border-b border-slate-850/60 px-2 py-1.5 flex gap-1 overflow-x-auto shrink-0">
-            <button id="btn-plantilla" onclick="cambiarPestana('plantilla')" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-600 text-white transition cursor-pointer">
-                <i class="fas fa-users mr-1.5"></i>Alumnat
-            </button>
-            <button id="btn-ejercicios" onclick="cambiarPestana('ejercicios')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition cursor-pointer">
-                <i class="fas fa-book-open mr-1.5"></i>Biblioteca
-            </button>
-            <button id="btn-entrenamientos" onclick="cambiarPestana('entrenamientos')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition cursor-pointer">
-                <i class="fas fa-graduation-cap mr-1.5"></i>Sessions
-            </button>
-            <button id="btn-partidos" onclick="cambiarPestana('partidos')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition cursor-pointer">
-                <i class="fas fa-clipboard-list mr-1.5"></i>Actes Match
-            </button>
-            <button id="btn-estadisticas" onclick="cambiarPestana('estadisticas')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition cursor-pointer">
-                <i class="fas fa-chart-bar mr-1.5"></i>Estadístiques
-            </button>
-            <button id="btn-configuracion" onclick="cambiarPestana('configuracion')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition cursor-pointer">
-                <i class="fas fa-cogs mr-1.5"></i>Configuració
-            </button>
+            <button id="btn-plantilla" onclick="cambiarPestana('plantilla')" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-600 text-white transition cursor-pointer"><i class="fas fa-users mr-1.5"></i>Alumnat</button>
+            <button id="btn-ejercicios" onclick="cambiarPestana('ejercicios')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition cursor-pointer"><i class="fas fa-book-open mr-1.5"></i>Biblioteca</button>
+            <button id="btn-entrenamientos" onclick="cambiarPestana('entrenamientos')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition cursor-pointer"><i class="fas fa-graduation-cap mr-1.5"></i>Sessions</button>
+            <button id="btn-partidos" onclick="cambiarPestana('partidos')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition cursor-pointer"><i class="fas fa-clipboard-list mr-1.5"></i>Actes Match</button>
+            <button id="btn-estadisticas" onclick="cambiarPestana('estadisticas')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition cursor-pointer"><i class="fas fa-chart-bar mr-1.5"></i>Estadístiques</button>
+            <button id="btn-configuracion" onclick="cambiarPestana('configuracion')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition cursor-pointer"><i class="fas fa-cogs mr-1.5"></i>Configuració</button>
         </nav>
 
         <main class="flex-1 overflow-y-auto p-4 max-w-7xl w-full mx-auto space-y-4">
@@ -99,19 +90,13 @@
                         <h2 id="titol-plantilla-equip" class="text-base font-black tracking-tight text-white">LLISTA DE GRUP</h2>
                         <p class="text-[11px] text-slate-400"><span id="total-jugadores">0</span> alumnes actius al quadern</p>
                     </div>
-                    <button onclick="obrirModalJugador('crear')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-3 py-1.5 rounded-xl transition cursor-pointer shadow">
-                        <i class="fas fa-user-plus mr-1.5"></i>Afegir Alumne
-                    </button>
+                    <button onclick="obrirModalJugador('crear')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-3 py-1.5 rounded-xl transition cursor-pointer shadow"><i class="fas fa-user-plus mr-1.5"></i>Afegir Alumne</button>
                 </div>
-
                 <div class="overflow-hidden bg-slate-900 border border-slate-850 rounded-2xl shadow-sm">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="border-b border-slate-850 bg-slate-950 text-[10px] font-bold uppercase tracking-wider text-slate-400 text-center">
-                                <th class="p-2.5 text-left w-12"></th>
-                                <th class="p-2.5 text-left w-16">Codi</th>
-                                <th class="p-2.5 text-left">Cognoms i Nom</th>
-                                <th class="p-2.5 text-right pr-4">Accions</th>
+                                <th class="p-2.5 text-left w-12"></th><th class="p-2.5 text-left w-16">Codi</th><th class="p-2.5 text-left">Cognoms i Nom</th><th class="p-2.5 text-right pr-4">Accions</th>
                             </tr>
                         </thead>
                         <tbody id="tabla-jugadores"></tbody>
@@ -120,10 +105,8 @@
             </section>
 
             <section id="seccion-ejercicios" class="seccion-oculta grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-                
                 <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3 shadow-sm md:sticky md:top-4">
                     <h3 class="font-black text-white text-xs uppercase tracking-wider border-b border-slate-850 pb-1.5"><i class="fas fa-plus-circle text-indigo-400 mr-1.5"></i>Pujar Nova Tasca</h3>
-                    
                     <div class="space-y-2.5 text-xs">
                         <div>
                             <label class="block text-slate-400 font-medium mb-1">Nom de la tasca / joc</label>
@@ -133,11 +116,7 @@
                             <div>
                                 <label class="block text-slate-400 font-medium mb-1">Categoria de treball</label>
                                 <select id="task-tipo" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-2 py-1.5 text-white text-xs cursor-pointer">
-                                    <option value="Roda de passades">Roda de passades</option>
-                                    <option value="Coordinació">Coordinació / Motor</option>
-                                    <option value="Rondos">Rondos</option>
-                                    <option value="Possessions">Possessions</option>
-                                    <option value="Partits">Jocs de Posició / Partits</option>
+                                    <option value="Roda de passades">Roda de passades</option><option value="Coordinació">Coordinació / Motor</option><option value="Rondos">Rondos</option><option value="Possessions">Possessions</option><option value="Partits">Jocs de Posició / Partits</option>
                                 </select>
                             </div>
                             <div>
@@ -147,24 +126,16 @@
                         </div>
                         <div>
                             <label class="block text-slate-400 font-medium mb-1">Instruccions de la tasca</label>
-                            <textarea id="task-explicacion" rows="3" placeholder="Explica l'organització, material i condicions del joc..." class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1.5 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 text-xs leading-relaxed"></textarea>
+                            <textarea id="task-explicacion" rows="3" placeholder="Explica l'organització, material..." class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1.5 text-white focus:outline-none text-xs leading-relaxed"></textarea>
                         </div>
-                        <button id="btn-pujar-tasca" onclick="crearEjercicioFirebase()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-xl text-xs transition cursor-pointer flex items-center justify-center gap-1.5 shadow">
-                            <i class="fas fa-cloud-upload-alt"></i> Desar a la Comunitat
-                        </button>
+                        <button id="btn-pujar-tasca" onclick="crearEjercicioFirebase()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow"><i class="fas fa-cloud-upload-alt"></i> Desar a la Comunitat</button>
                     </div>
                 </div>
-
                 <div class="md:col-span-2 space-y-3">
                     <div class="flex justify-between items-center border-b border-slate-900 pb-2">
                         <h3 id="total-tasques" class="font-black text-white text-sm uppercase tracking-wider">Biblioteca Comuna</h3>
                         <select id="task-filtro-tipo" onchange="renderitzarBibliotecaExercicis()" class="bg-slate-900 border border-slate-800 text-xs text-indigo-400 font-bold px-2.5 py-1 rounded-xl focus:outline-none cursor-pointer">
-                            <option value="Tots">Filtra per Categoria (Totes)</option>
-                            <option value="Roda de passades">Roda de passades</option>
-                            <option value="Coordinació">Coordinació / Motor</option>
-                            <option value="Rondos">Rondos</option>
-                            <option value="Possessions">Possessions</option>
-                            <option value="Partits">Jocs de Posició / Partits</option>
+                            <option value="Tots">Filtra per Categoria (Totes)</option><option value="Roda de passades">Roda de passades</option><option value="Coordinació">Coordinació / Motor</option><option value="Rondos">Rondos</option><option value="Possessions">Possessions</option><option value="Partits">Jocs de Posició / Partits</option>
                         </select>
                     </div>
                     <div id="grid-ejercicios" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></div>
@@ -172,10 +143,8 @@
             </section>
 
             <section id="seccion-entrenamientos" class="seccion-oculta grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-                
                 <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3 shadow-sm">
                     <h3 class="font-black text-white text-xs uppercase tracking-wider border-b border-slate-850 pb-1.5"><i class="fas fa-pencil-alt text-indigo-400 mr-1.5"></i>Programar Nova Sessió</h3>
-                    
                     <div class="space-y-2.5 text-xs">
                         <div class="grid grid-cols-2 gap-2">
                             <div>
@@ -187,43 +156,38 @@
                                 <input id="entreno-objetivo" type="text" placeholder="Ex: Resistència Aeròbica" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-2.5 py-1.5 text-white text-xs focus:outline-none">
                             </div>
                         </div>
-
                         <div class="border-t border-slate-850/60 pt-2 space-y-1.5">
                             <label class="block text-slate-500 font-bold text-[10px] uppercase tracking-wider mb-1">Cronograma de tasques</label>
                             <div class="space-y-1.5">
                                 <div class="grid grid-cols-3 gap-1">
-                                    <select id="slot-1-filter" onchange="filtrarSelectorSlotDinamic(1)" class="bg-slate-950 border border-slate-850 rounded-lg text-[11px] p-1 text-slate-400 focus:outline-none cursor-pointer"></select>
-                                    <select id="slot-1-select" class="col-span-2 bg-slate-950 border border-slate-850 rounded-lg text-[11px] p-1 text-white focus:outline-none cursor-pointer"></select>
+                                    <select id="slot-1-filter" onchange="filtrarSelectorSlotDinamic(1)" class="bg-slate-950 border border-slate-850 rounded-lg text-[11px] p-1 text-slate-400 focus:outline-none"></select>
+                                    <select id="slot-1-select" class="col-span-2 bg-slate-950 border border-slate-850 rounded-lg text-[11px] p-1 text-white focus:outline-none"></select>
                                 </div>
                                 <div class="grid grid-cols-3 gap-1">
-                                    <select id="slot-2-filter" onchange="filtrarSelectorSlotDinamic(2)" class="bg-slate-950 border border-slate-850 rounded-lg text-[11px] p-1 text-slate-400 focus:outline-none cursor-pointer"></select>
-                                    <select id="slot-2-select" class="col-span-2 bg-slate-950 border border-slate-850 rounded-lg text-[11px] p-1 text-white focus:outline-none cursor-pointer"></select>
+                                    <select id="slot-2-filter" onchange="filtrarSelectorSlotDinamic(2)" class="bg-slate-950 border border-slate-850 rounded-lg text-[11px] p-1 text-slate-400 focus:outline-none"></select>
+                                    <select id="slot-2-select" class="col-span-2 bg-slate-950 border border-slate-850 rounded-lg text-[11px] p-1 text-white focus:outline-none"></select>
                                 </div>
                                 <div class="grid grid-cols-3 gap-1">
-                                    <select id="slot-3-filter" onchange="filtrarSelectorSlotDinamic(3)" class="bg-slate-950 border border-slate-850 rounded-lg text-[11px] p-1 text-slate-400 focus:outline-none cursor-pointer"></select>
-                                    <select id="slot-3-select" class="col-span-2 bg-slate-950 border border-slate-850 rounded-lg text-[11px] p-1 text-white focus:outline-none cursor-pointer"></select>
+                                    <select id="slot-3-filter" onchange="filtrarSelectorSlotDinamic(3)" class="bg-slate-950 border border-slate-850 rounded-lg text-[11px] p-1 text-slate-400 focus:outline-none"></select>
+                                    <select id="slot-3-select" class="col-span-2 bg-slate-950 border border-slate-850 rounded-lg text-[11px] p-1 text-white focus:outline-none"></select>
                                 </div>
                                 <div class="grid grid-cols-3 gap-1">
-                                    <select id="slot-4-filter" onchange="filtrarSelectorSlotDinamic(4)" class="bg-slate-950 border border-slate-850 rounded-lg text-[11px] p-1 text-slate-400 focus:outline-none cursor-pointer"></select>
-                                    <select id="slot-4-select" class="col-span-2 bg-slate-950 border border-slate-850 rounded-lg text-[11px] p-1 text-white focus:outline-none cursor-pointer"></select>
+                                    <select id="slot-4-filter" onchange="filtrarSelectorSlotDinamic(4)" class="bg-slate-950 border border-slate-850 rounded-lg text-[11px] p-1 text-slate-400 focus:outline-none"></select>
+                                    <select id="slot-4-select" class="col-span-2 bg-slate-950 border border-slate-850 rounded-lg text-[11px] p-1 text-white focus:outline-none"></select>
                                 </div>
                                 <div class="grid grid-cols-3 gap-1">
-                                    <select id="slot-5-filter" onchange="filtrarSelectorSlotDinamic(5)" class="bg-slate-950 border border-slate-850 rounded-lg text-[11px] p-1 text-slate-400 focus:outline-none cursor-pointer"></select>
-                                    <select id="slot-5-select" class="col-span-2 bg-slate-950 border border-slate-850 rounded-lg text-[11px] p-1 text-white focus:outline-none cursor-pointer"></select>
+                                    <select id="slot-5-filter" onchange="filtrarSelectorSlotDinamic(5)" class="bg-slate-950 border border-slate-850 rounded-lg text-[11px] p-1 text-slate-400 focus:outline-none"></select>
+                                    <select id="slot-5-select" class="col-span-2 bg-slate-950 border border-slate-850 rounded-lg text-[11px] p-1 text-white focus:outline-none"></select>
                                 </div>
                             </div>
                         </div>
-
                         <div>
                             <label class="block text-slate-400 font-medium mb-1">Notes de Material</label>
-                            <input id="entreno-notes" type="text" placeholder="Ex: Cons, petos de colors..." class="w-full bg-slate-950 border border-slate-850 rounded-xl px-2.5 py-1.5 text-white text-xs focus:outline-none">
+                            <input id="entreno-notes" type="text" placeholder="Ex: Cons, petos..." class="w-full bg-slate-950 border border-slate-850 rounded-xl px-2.5 py-1.5 text-white text-xs focus:outline-none">
                         </div>
-                        <button onclick="crearEntrenamiento()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-xl text-xs transition cursor-pointer shadow">
-                            Guardar Sessió
-                        </button>
+                        <button onclick="crearEntrenamiento()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-xl text-xs transition shadow">Guardar Sessió</button>
                     </div>
                 </div>
-
                 <div class="md:col-span-2 space-y-3">
                     <h3 class="font-black text-white text-sm uppercase tracking-wider border-b border-slate-900 pb-2">Diari de Sessions Guardades</h3>
                     <div id="lista-entrenamientos" class="space-y-2"></div>
@@ -238,26 +202,20 @@
                         <p id="det-entreno-meta" class="text-xs text-slate-400">Metadades de la sessió</p>
                     </div>
                 </div>
-
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
                     <div class="lg:col-span-2 space-y-3">
                         <h3 class="font-black text-white text-xs uppercase tracking-wider text-slate-400"><i class="fas fa-stream text-indigo-400 mr-1.5"></i>Estructura Pràctica</h3>
                         <div id="det-entreno-lista-tasques" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
                     </div>
-
                     <div class="bg-slate-900 border border-slate-800 p-3 rounded-2xl space-y-3 shadow-md lg:sticky lg:top-4">
                         <div class="flex justify-between items-center border-b border-slate-850 pb-2">
                             <h3 class="font-black text-white text-xs uppercase tracking-wider flex items-center gap-1.5"><i class="fas fa-check-square text-teal-400"></i>Control d'Assistència</h3>
                             <span class="text-[10px] text-slate-500 font-mono">P/A/J</span>
                         </div>
                         <div class="max-h-[380px] overflow-y-auto border border-slate-850 rounded-xl bg-slate-950/50">
-                            <table class="w-full text-xs">
-                                <tbody id="tabla-asistencia-sesion-interna"></tbody>
-                            </table>
+                            <table class="w-full text-xs"><tbody id="tabla-asistencia-sesion-interna"></tbody></table>
                         </div>
-                        <button onclick="desarAsistenciaSessióActual()" class="w-full bg-teal-600 hover:bg-teal-500 text-white font-black py-2 rounded-xl text-xs transition cursor-pointer shadow-md mt-1">
-                            <i class="fas fa-save mr-1"></i> Desar Canvis d'Assistència
-                        </button>
+                        <button onclick="desarAsistenciaSessióActual()" class="w-full bg-teal-600 hover:bg-teal-500 text-white font-black py-2 rounded-xl text-xs transition shadow-md mt-1"><i class="fas fa-save mr-1"></i> Desar Canvis d'Assistència</button>
                     </div>
                 </div>
             </section>
@@ -274,8 +232,7 @@
                             <div>
                                 <label class="block text-slate-400 font-medium mb-1">Pista / Camp</label>
                                 <select id="partido-campo" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-2 py-1.5 text-white text-xs cursor-pointer">
-                                    <option value="Camp Local">Pista Coberta</option>
-                                    <option value="Camp Visitant">Camp Exterior</option>
+                                    <option value="Camp Local">Pista Coberta</option><option value="Camp Visitant">Camp Exterior</option>
                                 </select>
                             </div>
                             <div>
@@ -287,12 +244,9 @@
                             <label class="block text-slate-400 font-medium mb-1">Hora</label>
                             <input id="partido-hora" type="time" value="09:00" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1 text-white text-xs focus:outline-none">
                         </div>
-                        <button onclick="crearPartidoRapido()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-xl text-xs transition cursor-pointer shadow">
-                            Obrir Nova Acta
-                        </button>
+                        <button onclick="crearPartidoRapido()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-xl text-xs transition shadow">Obrir Nova Acta</button>
                     </div>
                 </div>
-
                 <div class="md:col-span-2 space-y-3">
                     <h3 class="font-black text-white text-sm uppercase tracking-wider border-b border-slate-900 pb-2">Historial d'Actes</h3>
                     <div id="lista-partidos" class="space-y-2"></div>
@@ -308,162 +262,102 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
-                    <div class="lg:col-span-2 space-y-3">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+                    
+                    <div class="lg:col-span-5 space-y-3">
                         <div class="flex justify-between items-center bg-slate-900/60 px-3 py-2 rounded-xl border border-slate-850">
-                            <span class="font-black text-white text-xs uppercase tracking-wider"><i class="fas fa-clipboard-check text-indigo-400 mr-1.5"></i>Control de l'Alumnat Convocat</span>
+                            <span class="font-black text-white text-xs uppercase tracking-wider"><i class="fas fa-clipboard-check text-indigo-400 mr-1.5"></i>Alumnat Convocat</span>
                             <div class="flex items-center space-x-2 font-mono text-xs font-black">
                                 <span class="text-indigo-400 bg-slate-950 border border-slate-800 px-2 py-0.5 rounded" id="acta-gols-nostres">0</span>
                                 <span class="text-slate-600">-</span>
                                 <button onclick="let g=document.getElementById('acta-gols-rival-auto'); let v=Math.max(0, parseInt(g.innerText)+1); g.innerText=v; let p=DB_PARTITS.find(x=>x.id===partitIdActualGestio); if(p){p.golsRival=v; localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS));}" class="bg-slate-950 border border-slate-800 text-rose-400 px-2 py-0.5 rounded cursor-pointer hover:border-slate-700" id="acta-gols-rival-auto">0</button>
                             </div>
                         </div>
-                        <div id="lista-convocatoria-check" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+                        <div id="lista-convocatoria-check" class="space-y-1.5 max-h-[320px] overflow-y-auto pr-1"></div>
                         <div>
-                            <label class="block text-slate-400 font-medium text-xs mb-1">Anotacions post-partit / Valoració Didàctica</label>
-                            <textarea id="acta-valoracion" rows="2" oninput="let p=DB_PARTITS.find(x=>x.id===partitIdActualGestio); if(p){p.valoracio=this.value; localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS));}" placeholder="Observacions del comportament, valors de joc net..." class="w-full bg-slate-900 border border-slate-850 rounded-xl px-3 py-1.5 text-white text-xs focus:outline-none focus:border-indigo-500 leading-relaxed"></textarea>
+                            <label class="block text-slate-400 font-medium text-xs mb-1">Valoració Didàctica Post-partit</label>
+                            <textarea id="acta-valoracion" rows="2" oninput="let p=DB_PARTITS.find(x=>x.id===partitIdActualGestio); if(p){p.valoracio=this.value; localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS));}" placeholder="Observacions del comportament..." class="w-full bg-slate-900 border border-slate-850 rounded-xl px-3 py-1.5 text-white text-xs focus:outline-none focus:border-indigo-500 leading-relaxed"></textarea>
                         </div>
                     </div>
 
-                    <div class="bg-slate-900 border border-slate-800 p-3 rounded-2xl space-y-3 shadow-md lg:sticky lg:top-4">
-                        <div class="border-b border-slate-850 pb-2">
-                            <h3 class="font-black text-white text-xs uppercase tracking-wider flex items-center gap-1.5"><i class="fas fa-history text-teal-400"></i>Cronograma de Canvis (F7)</h3>
-                        </div>
-                        <div class="grid grid-cols-4 gap-1">
-                            <button id="btn-q-2" onclick="seleccionarQuartFitxa(2)" class="py-1 bg-teal-600 text-white font-mono font-bold text-xs rounded border border-teal-500 shadow-sm cursor-pointer">Q2</button>
-                            <button id="btn-q-3" onclick="seleccionarQuartFitxa(3)" class="py-1 bg-slate-800 text-slate-400 font-mono font-bold text-xs rounded border border-slate-700 cursor-pointer">Q3</button>
-                            <button id="btn-q-4" onclick="seleccionarQuartFitxa(4)" class="py-1 bg-slate-800 text-slate-400 font-mono font-bold text-xs rounded border border-slate-700 cursor-pointer">Q4</button>
-                            <button id="btn-q-int4" onclick="seleccionarQuartFitxa('int4')" class="py-1 bg-slate-800 text-slate-400 font-mono font-bold text-xs rounded border border-slate-700 cursor-pointer">Min</button>
-                        </div>
-                        <div id="wrapper-minuto-q4" class="seccion-oculta bg-slate-950 p-2 border border-slate-850 rounded-xl flex items-center justify-between text-xs">
-                            <span class="text-slate-400 font-medium">Especifica el Minut (1-48):</span>
-                            <input type="number" id="cambio-minuto-real" value="42" min="1" max="48" class="w-12 bg-slate-900 border border-slate-800 rounded font-mono p-0.5 text-center text-white focus:outline-none">
-                        </div>
-                        <div class="bg-slate-950 p-2.5 border border-slate-850 rounded-xl space-y-2 text-xs">
-                            <input type="hidden" id="cambio-quarto-actiu" value="2">
-                            <div class="grid grid-cols-2 gap-2">
+                    <div class="lg:col-span-7 space-y-3">
+                        <div class="bg-slate-900 border border-slate-800 p-3 rounded-2xl shadow-sm space-y-3">
+                            <div class="flex justify-between items-center border-b border-slate-850 pb-1.5">
+                                <h3 class="font-black text-white text-xs uppercase tracking-wider"><i class="fas fa-history text-teal-400 mr-1"></i>Cronograma de Canvis i Rotació (F7)</h3>
+                                <select id="partido-sistema-joc" onchange="canviarSistemaITenirEnComptesPosicions()" class="bg-slate-950 border border-slate-850 rounded px-2 py-0.5 text-[10px] text-indigo-400 font-bold focus:outline-none cursor-pointer"><option value="1-2-3-1">F7: 1-2-3-1</option><option value="1-3-2-1">F7: 1-3-2-1</option></select>
+                            </div>
+                            
+                            <div class="grid grid-cols-4 gap-1">
+                                <button id="btn-q-2" onclick="seleccionarQuartFitxa(2)" class="py-1 bg-teal-600 text-white font-mono font-bold text-xs rounded border border-teal-500 shadow-sm">Q2</button>
+                                <button id="btn-q-3" onclick="seleccionarQuartFitxa(3)" class="py-1 bg-slate-800 text-slate-400 font-mono font-bold text-xs rounded border border-slate-700">Q3</button>
+                                <button id="btn-q-4" onclick="seleccionarQuartFitxa(4)" class="py-1 bg-slate-800 text-slate-400 font-mono font-bold text-xs rounded border border-slate-700">Q4</button>
+                                <button id="btn-q-int4" onclick="seleccionarQuartFitxa('int4')" class="py-1 bg-slate-800 text-slate-400 font-mono font-bold text-xs rounded border border-slate-700">Min</button>
+                            </div>
+                            
+                            <div id="wrapper-minuto-q4" class="seccion-oculta bg-slate-950 p-2 border border-slate-850 rounded-xl flex items-center justify-between text-xs">
+                                <span class="text-slate-400 font-medium">Especifica el Minut (1-48):</span>
+                                <input type="number" id="cambio-minuto-real" value="42" min="1" max="48" class="w-12 bg-slate-900 border border-slate-800 rounded font-mono p-0.5 text-center text-white focus:outline-none">
+                            </div>
+                            
+                            <div class="bg-slate-950 p-2 border border-slate-850 rounded-xl grid grid-cols-2 gap-2 text-xs">
+                                <input type="hidden" id="cambio-quarto-actiu" value="2">
                                 <div>
                                     <label class="block text-slate-500 font-bold text-[10px] uppercase mb-0.5">Surt ❌</label>
-                                    <select id="cambio-sale-select" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1 text-white focus:outline-none cursor-pointer"></select>
+                                    <select id="cambio-sale-select" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1 text-white focus:outline-none"></select>
                                 </div>
                                 <div>
                                     <label class="block text-slate-500 font-bold text-[10px] uppercase mb-0.5">Entra ✅</label>
-                                    <select id="cambio-entra-select" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1 text-white focus:outline-none cursor-pointer"></select>
+                                    <select id="cambio-entra-select" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-1 text-white focus:outline-none"></select>
                                 </div>
+                                <button onclick="afegirSubstitucioCronologica()" class="col-span-2 bg-slate-800 hover:bg-slate-700 text-teal-400 font-bold py-1.5 rounded-lg border border-slate-700/60 text-[11px]">Registrar Rotació</button>
                             </div>
-                            <button onclick="afegirSubstitucioCronologica()" class="w-full bg-slate-800 hover:bg-slate-700 text-teal-400 font-bold py-1.5 rounded-lg border border-slate-700/60 tracking-wide text-[11px] cursor-pointer transition">
-                                <i class="fas fa-plus mr-1"></i> Registrar Rotació
-                            </button>
+                            
+                            <div id="historial-cambios-linea" class="max-h-[85px] overflow-y-auto space-y-1 pr-1"></div>
                         </div>
-                        <div class="space-y-1">
-                            <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Historial de canvis:</span>
-                            <div id="historial-cambios-linea" class="max-h-[140px] overflow-y-auto space-y-1 pr-1"></div>
+
+                        <div class="bg-slate-900 border border-slate-800 p-3 rounded-2xl shadow-sm space-y-2">
+                            <span class="text-[11px] font-black uppercase text-slate-400 block"><i class="fas fa-th-large text-emerald-400 mr-1.5"></i>Tria els 7 Alumnes Titulars (Primer Quart)</span>
+                            <div class="campo-futbol w-full h-[280px] rounded-xl overflow-hidden p-3 relative flex flex-col justify-between shadow-inner" id="visual-terreno-juego">
+                                <div class="area-top"></div><div class="area-bottom"></div>
+                                <div class="w-full h-full flex flex-col justify-between relative z-10" id="wrapper-posicions-tactiques-camp"></div>
+                            </div>
+                            <div id="tactical-canvas-container" class="hidden"></div>
                         </div>
-                        <div id="tactical-canvas-container" class="hidden"></div>
                     </div>
                 </div>
             </section>
 
             <section id="seccion-estadisticas" class="seccion-oculta space-y-4">
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-center shadow-sm">
-                        <span class="block text-slate-500 text-[10px] uppercase tracking-wider font-bold">Actes registrades</span>
-                        <b id="stat-total-encontres" class="text-xl text-white font-black">0</b>
-                    </div>
-                    <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-center shadow-sm">
-                        <span class="block text-slate-500 text-[10px] uppercase tracking-wider font-bold">Gols totals favor</span>
-                        <b id="stat-gols-favor" class="text-xl text-emerald-400 font-black">0</b>
-                    </div>
-                    <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-center shadow-sm">
-                        <span class="block text-slate-500 text-[10px] uppercase tracking-wider font-bold">Gols totals contra</span>
-                        <b id="stat-gols-contra" class="text-xl text-rose-400 font-black">0</b>
-                    </div>
-                    <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-center shadow-sm">
-                        <span class="block text-slate-500 text-[10px] uppercase tracking-wider font-bold">Balanç (G/E/P)</span>
-                        <div class="text-sm font-mono font-bold mt-1 text-indigo-400">
-                            <span id="stat-partidos-ganados">0</span> / <span id="stat-partidos-empatados">0</span> / <span id="stat-partidos-perdidos">0</span>
-                        </div>
-                    </div>
+                    <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-center"><span class="block text-slate-500 text-[10px] uppercase tracking-wider font-bold">Actes registrades</span><b id="stat-total-encontres" class="text-xl text-white font-black">0</b></div>
+                    <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-center"><span class="block text-slate-500 text-[10px] uppercase tracking-wider font-bold">Gols favor</span><b id="stat-gols-favor" class="text-xl text-emerald-400 font-black">0</b></div>
+                    <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-center"><span class="block text-slate-500 text-[10px] uppercase tracking-wider font-bold">Gols contra</span><b id="stat-gols-contra" class="text-xl text-rose-400 font-black">0</b></div>
+                    <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-center"><span class="block text-slate-500 text-[10px] uppercase tracking-wider font-bold">Balanç (G/E/P)</span><div class="text-sm font-mono font-bold mt-1 text-indigo-400"><span id="stat-partidos-ganados">0</span> / <span id="stat-partidos-empatados">0</span> / <span id="stat-partidos-perdidos">0</span></div></div>
                 </div>
-
                 <div class="overflow-hidden bg-slate-900 border border-slate-850 rounded-2xl shadow-sm">
-                    <div class="bg-slate-950 p-3 border-b border-slate-850">
-                        <h3 class="font-black text-white text-xs uppercase tracking-wider"><i class="fas fa-chart-line text-indigo-400 mr-1.5"></i>Rendiment i Minuts Individuals Acumulats</h3>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-xs">
-                            <thead>
-                                <tr class="bg-slate-950/40 border-b border-slate-850 text-[10px] text-slate-400 font-bold uppercase tracking-wider text-center">
-                                    <th class="p-2.5 text-left pl-4">Alumne</th>
-                                    <th class="p-2.5">Partits Convocat</th>
-                                    <th class="p-2.5">Titular (Q1)</th>
-                                    <th class="p-2.5">Suplent</th>
-                                    <th class="p-2.5">Minuts Totals</th>
-                                    <th class="p-2.5">Mitjana min/partit</th>
-                                    <th class="p-2.5">% Minuts jugats</th>
-                                    <th class="p-2.5">Gols anotats</th>
-                                </tr>
-                            </thead>
-                            <tbody id="stat-tabla-completa-jugadores"></tbody>
-                        </table>
-                    </div>
+                    <div class="bg-slate-950 p-3 border-b border-slate-850"><h3 class="font-black text-white text-xs uppercase tracking-wider"><i class="fas fa-chart-line text-indigo-400 mr-1.5"></i>Minuts Individuals Acumulats</h3></div>
+                    <div class="overflow-x-auto"><table class="w-full text-xs"><thead><tr class="bg-slate-950/40 border-b border-slate-850 text-[10px] text-slate-400 font-bold uppercase tracking-wider text-center"><th class="p-2.5 text-left pl-4">Alumne</th><th>Partits Convocat</th><th>Titular (Q1)</th><th>Suplent</th><th>Minuts Totals</th><th>Mitjana min/partit</th><th>% Minuts jugats</th><th>Gols anotats</th></tr></thead><tbody id="stat-tabla-completa-jugadores"></tbody></table></div>
                 </div>
             </section>
 
             <section id="seccion-configuracion" class="seccion-oculta space-y-6">
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-                    <div class="flex items-center space-x-3 border-b border-slate-850 pb-3">
-                        <div class="w-8 h-8 bg-indigo-950 border border-indigo-800 rounded-lg flex items-center justify-center text-indigo-400"><i class="fas fa-school text-sm"></i></div>
-                        <div>
-                            <h3 class="text-sm font-black text-white">IDENTITAT DEL CENTRE</h3>
-                            <p class="text-[11px] text-slate-500">Nom principal de la institució escolar</p>
-                        </div>
-                    </div>
+                    <div class="flex items-center space-x-3 border-b border-slate-850 pb-3"><div class="w-8 h-8 bg-indigo-950 border border-indigo-800 rounded-lg flex items-center justify-center text-indigo-400"><i class="fas fa-school text-sm"></i></div><div><h3 class="text-sm font-black text-white">IDENTITAT DEL CENTRE</h3><p class="text-[11px] text-slate-500">Nom de la institució escolar</p></div></div>
                     <div class="space-y-3 text-xs">
-                        <div>
-                            <label class="block text-slate-400 font-medium mb-1">Nom de l'Entitat / Institut</label>
-                            <input type="text" id="cfg-nom-club" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:outline-none focus:border-indigo-500 font-medium">
-                        </div>
-                        <button onclick="actualitzarConfiguracioEntitat()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-xl transition cursor-pointer w-full text-xs shadow">
-                            <i class="fas fa-save mr-1"></i> Desar Nom de Centre
-                        </button>
+                        <div><label class="block text-slate-400 font-medium mb-1">Nom de l'Institut</label><input type="text" id="cfg-nom-club" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:outline-none"></div>
+                        <button onclick="actualitzarConfiguracioEntitat()" class="bg-indigo-600 text-white font-bold py-2 rounded-xl w-full text-xs shadow"><i class="fas fa-save mr-1"></i> Desar Nom de Centre</button>
                     </div>
                 </div>
-
                 <div id="cfg-panell-coordinador-equips" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-                    <div class="flex items-center space-x-3 border-b border-slate-850 pb-3">
-                        <div class="w-8 h-8 bg-teal-950 border border-teal-800 rounded-lg flex items-center justify-center text-teal-400"><i class="fas fa-users-cog text-sm"></i></div>
-                        <div>
-                            <h3 class="text-sm font-black text-white">PANEL DE GESTIÓ D'EQUIPS (COORDINADOR)</h3>
-                            <p class="text-[11px] text-slate-500">Crea nous grups o equips amb el seu propi accés personalitzat</p>
-                        </div>
-                    </div>
-                    
+                    <div class="flex items-center space-x-3 border-b border-slate-850 pb-3"><div class="w-8 h-8 bg-teal-950 border border-teal-800 rounded-lg flex items-center justify-center text-teal-400"><i class="fas fa-users-cog text-sm"></i></div><div><h3 class="text-sm font-black text-white">PANEL DE GESTIÓ D'EQUIPS (COORDINADOR)</h3><p class="text-[11px] text-slate-500">Crea nous grups o equips amb accés personalitzat</p></div></div>
                     <div class="bg-slate-950 p-4 rounded-xl border border-slate-850 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
                         <div class="md:col-span-3"><span class="text-[10px] font-bold text-teal-400 uppercase tracking-wider">Registrar Nou Equip i Usuari</span></div>
-                        <div>
-                            <label class="block text-slate-400 mb-1">Nom de l'Equip / Curs</label>
-                            <input type="text" id="cfg-nou-equip-nom" placeholder="Ex: 1r ESO - Grup C" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-teal-500">
-                        </div>
-                        <div>
-                            <label class="block text-slate-400 mb-1">Email de l'Entrenador / Tutor</label>
-                            <input type="email" id="cfg-nou-equip-email" placeholder="entrenadorC@club.com" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-teal-500">
-                        </div>
-                        <div>
-                            <label class="block text-slate-400 mb-1">Contrasenya d'Accés</label>
-                            <input type="password" id="cfg-nou-equip-pass" placeholder="****" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white focus:outline-none focus:border-teal-500">
-                        </div>
-                        <div class="md:col-span-3 pt-2">
-                            <button onclick="crearEquipIDosierDinamic()" class="bg-teal-600 hover:bg-teal-500 text-white font-bold px-4 py-2 rounded-lg transition cursor-pointer w-full text-xs">
-                                <i class="fas fa-plus-circle mr-1"></i> Donar d'Alta Equip i Usuari
-                            </button>
-                        </div>
+                        <div><label class="block text-slate-400 mb-1">Nom de l'Equip / Curs</label><input type="text" id="cfg-nou-equip-nom" placeholder="Ex: 1r ESO - Grup C" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs"></div>
+                        <div><label class="block text-slate-400 mb-1">Email de l'Entrenador</label><input type="email" id="cfg-nou-equip-email" placeholder="entrenadorC@club.com" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs"></div>
+                        <div><label class="block text-slate-400 mb-1">Contrasenya</label><input type="password" id="cfg-nou-equip-pass" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs"></div>
+                        <div class="md:col-span-3 pt-2"><button onclick="crearEquipIDosierDinamic()" class="bg-teal-600 text-white font-bold px-4 py-2 rounded-lg w-full text-xs"><i class="fas fa-plus-circle mr-1"></i> Donar d'Alta Equip</button></div>
                     </div>
-
-                    <div class="space-y-2 pt-2">
-                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Equips / Grups Actius al Sistema</span>
-                        <div id="cfg-llista-equips-sistema" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
-                    </div>
+                    <div class="space-y-2 pt-2"><span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Equips / Grups Actius</span><div id="cfg-llista-equips-sistema" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div></div>
                 </div>
             </section>
         </main>
@@ -471,76 +365,41 @@
 
     <div id="modal-jugador" class="seccion-oculta fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
         <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl max-w-sm w-full space-y-3 shadow-2xl">
-            <h3 class="font-black text-white text-xs uppercase tracking-wider border-b border-slate-850 pb-1.5"><i class="fas fa-id-card text-indigo-400 mr-1.5"></i>Fitxa de dades individuals</h3>
+            <h3 class="font-black text-white text-xs uppercase tracking-wider border-b border-slate-850 pb-1.5"><i class="fas fa-id-card text-indigo-400 mr-1.5"></i>Fitxa de dades</h3>
             <input type="hidden" id="player-id-edicio">
             <div class="space-y-2 text-xs">
-                <div>
-                    <label class="block text-slate-400 font-medium mb-1">Cognoms i Nom de l'alumne</label>
-                    <input id="player-nom" type="text" placeholder="Ex: Martí, Joan" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1.5 text-white focus:outline-none text-xs">
-                </div>
+                <div><label class="block text-slate-400 font-medium mb-1">Cognoms i Nom</label><input id="player-nom" type="text" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1.5 text-white"></div>
                 <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-slate-400 font-medium mb-1">Codi ID / Dorsal</label>
-                        <input id="player-dorsal" type="number" placeholder="Ex: 14" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1.5 text-white focus:outline-none text-xs">
-                    </div>
-                    <div>
-                        <label class="block text-slate-400 font-medium mb-1">Perfil / Lateralitat</label>
-                        <select id="player-lateral" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-2 py-1.5 text-white text-xs cursor-pointer">
-                            <option value="Dretà">Dretà (Predom. Dret)</option>
-                            <option value="Esquerrà">Esquerrà (Predom. Esquerre)</option>
-                            <option value="Ambidiestre">Ambidiestre / Ambdós</option>
-                        </select>
-                    </div>
+                    <div><label class="block text-slate-400 font-medium mb-1">Codi ID / Dorsal</label><input id="player-dorsal" type="number" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1.5 text-white"></div>
+                    <div><label class="block text-slate-400 font-medium mb-1">Perfil / Lateralitat</label><select id="player-lateral" class="w-full bg-slate-950 border border-slate-850 rounded-xl p-1.5 text-white cursor-pointer"><option value="Dretà">Dretà</option><option value="Esquerrà">Esquerrà</option></select></div>
                 </div>
-                <div>
-                    <label class="block text-slate-400 font-medium mb-1">Rol / Nivell inicial</label>
-                    <input id="player-p1" type="text" placeholder="Ex: Pivot / Alt rendiment" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1.5 text-white focus:outline-none text-xs">
-                </div>
+                <div><label class="block text-slate-400 font-medium mb-1">Rol / Nivell inicial</label><input id="player-p1" type="text" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1.5 text-white"></div>
                 <div class="grid grid-cols-2 gap-2 border-t border-slate-850 pt-2">
-                    <div>
-                        <label class="block text-slate-500 font-bold text-[10px] uppercase mb-1">Telèfon Pare / Tutor 1</label>
-                        <input id="player-tel-pare" type="text" placeholder="600 000 000" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1.5 text-white focus:outline-none text-xs">
-                    </div>
-                    <div>
-                        <label class="block text-slate-500 font-bold text-[10px] uppercase mb-1">Telèfon Mare / Tutor 2</label>
-                        <input id="player-tel-mare" type="text" placeholder="600 000 000" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1.5 text-white focus:outline-none text-xs">
-                    </div>
+                    <div><label class="block text-slate-500 font-bold text-[10px] uppercase mb-1">Telèfon Tutor 1</label><input id="player-tel-pare" type="text" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1.5 text-white"></div>
+                    <div><label class="block text-slate-500 font-bold text-[10px] uppercase mb-1">Telèfon Tutor 2</label><input id="player-tel-mare" type="text" class="w-full bg-slate-950 border border-slate-850 rounded-xl px-3 py-1.5 text-white"></div>
                 </div>
             </div>
-            <div class="grid grid-cols-2 gap-2 pt-2 text-xs font-bold">
-                <button onclick="tancarModalJugador()" class="bg-slate-800 hover:bg-slate-750 text-slate-400 py-2 rounded-xl transition cursor-pointer">Cancel·lar</button>
-                <button onclick="guardarJugador()" class="bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-xl transition cursor-pointer shadow">Desar Fitxa</button>
-            </div>
+            <div class="grid grid-cols-2 gap-2 pt-2 text-xs font-bold"><button onclick="tancarModalJugador()" class="bg-slate-800 text-slate-400 py-2 rounded-xl">Cancel·lar</button><button onclick="guardarJugador()" class="bg-indigo-600 text-white py-2 rounded-xl">Desar Fitxa</button></div>
         </div>
     </div>
 
     <div id="modal-fitxa-jugador" class="seccion-oculta fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
         <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl max-w-sm w-full space-y-4 shadow-2xl relative">
-            <button onclick="tancarFitxaJugador()" class="absolute top-3 right-3 text-slate-500 hover:text-white transition cursor-pointer"><i class="fas fa-times-circle text-base"></i></button>
+            <button onclick="tancarFitxaJugador()" class="absolute top-3 right-3 text-slate-500 hover:text-white"><i class="fas fa-times-circle text-base"></i></button>
             <div class="text-center space-y-1">
                 <div class="w-12 h-12 bg-indigo-950 border border-indigo-900 rounded-full flex items-center justify-center text-indigo-400 text-lg font-bold mx-auto shadow-inner"><i class="fas fa-user-graduate"></i></div>
-                <h3 id="fitxa-nom" class="font-black text-white text-base tracking-tight pt-1">Cognoms, Nom</h3>
-                <span id="fitxa-dorsal" class="inline-block bg-slate-950 border border-slate-850 font-mono text-[10px] px-2 py-0.5 rounded text-indigo-400 font-bold">#00</span>
+                <h3 id="fitxa-nom" class="font-black text-white text-base tracking-tight pt-1">Cognoms, Nom</h3><span id="fitxa-dorsal" class="inline-block bg-slate-950 border border-slate-850 font-mono text-[10px] px-2 py-0.5 rounded text-indigo-400 font-bold">#00</span>
             </div>
             <div class="bg-slate-950 border border-slate-850 p-2.5 rounded-xl space-y-1.5 text-xs">
                 <div class="flex justify-between border-b border-slate-900 pb-1"><span class="text-slate-500">Perfil:</span> <span id="fitxa-p1" class="font-bold text-white">Sense dades</span></div>
                 <div class="flex justify-between"><span class="text-slate-500">Lateralitat:</span> <span id="fitxa-lateral" class="font-bold text-white">Sense dades</span></div>
             </div>
             <div class="space-y-2 border-t border-slate-850 pt-2.5">
-                <span class="block text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1"><i class="fas fa-phone-alt"></i> Canals de Comunicació de Família</span>
-                <div class="flex items-center justify-between bg-slate-950/40 p-2 rounded-xl border border-slate-850/60 gap-2">
-                    <p id="fitxa-text-pare" class="text-xs text-slate-300 truncate"></p>
-                    <div id="fitxa-accions-pare" class="flex space-x-1 shrink-0"></div>
-                </div>
-                <div class="flex items-center justify-between bg-slate-950/40 p-2 rounded-xl border border-slate-850/60 gap-2">
-                    <p id="fitxa-text-mare" class="text-xs text-slate-300 truncate"></p>
-                    <div id="fitxa-accions-mare" class="flex space-x-1 shrink-0"></div>
-                </div>
+                <span class="block text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1"><i class="fas fa-phone-alt"></i> Canals de Família</span>
+                <div class="flex items-center justify-between bg-slate-950/40 p-2 rounded-xl border border-slate-850/60 gap-2"><p id="fitxa-text-pare" class="text-xs text-slate-300 truncate"></p><div id="fitxa-accions-pare" class="flex space-x-1 shrink-0"></div></div>
+                <div class="flex items-center justify-between bg-slate-950/40 p-2 rounded-xl border border-slate-850/60 gap-2"><p id="fitxa-text-mare" class="text-xs text-slate-300 truncate"></p><div id="fitxa-accions-mare" class="flex space-x-1 shrink-0"></div></div>
             </div>
-            <div class="grid grid-cols-2 gap-2 pt-1 text-[11px] font-bold border-t border-slate-850/60 pt-2.5">
-                <button id="btn-fitxa-eliminar" class="bg-slate-950 border border-slate-850 text-rose-400 py-1.5 rounded-xl hover:bg-rose-950/20 cursor-pointer transition"><i class="fas fa-trash-alt mr-1"></i>Baixa Alumne</button>
-                <button id="btn-fitxa-editar" class="bg-slate-800 text-white py-1.5 rounded-xl hover:bg-slate-700 cursor-pointer transition"><i class="fas fa-edit mr-1"></i>Modificar Fitxa</button>
-            </div>
+            <div class="grid grid-cols-2 gap-2 pt-1 text-[11px] font-bold border-t border-slate-850/60 pt-2.5"><button id="btn-fitxa-eliminar" class="bg-slate-950 border border-slate-850 text-rose-400 py-1.5 rounded-xl">Baixa Alumne</button><button id="btn-fitxa-editar" class="bg-slate-800 text-white py-1.5 rounded-xl">Modificar Fitxa</button></div>
         </div>
     </div>
 
