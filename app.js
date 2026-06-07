@@ -3,7 +3,6 @@
 // ==========================================================================
 let CONFIG_CLUB = JSON.parse(localStorage.getItem('fc_config_multi')) || { nomClub: "INSTITUT LES CORTS" };
 
-// Llista d'equips inicials amb la seva categoria per defecte (aleví = 15' per quart)
 let LLISTA_EQUIPS = JSON.parse(localStorage.getItem('fc_equips_multi')) || [
     { id: "1eso-a", nom: "1r ESO - Grup A", categoria: "benjami" }, 
     { id: "1eso-b", nom: "1r ESO - Grup B", categoria: "benjami" }
@@ -337,6 +336,9 @@ function guardarJugador() {
     localStorage.setItem('fc_jugadors_multi', JSON.stringify(DB_JUGADORS)); tancarModalJugador(); renderitzarPlantilla(); 
 }
 
+// ==========================================
+// 6.B FITXA INDIVIDUAL DE CONTACTE
+// ==========================================
 function obrirFitxaJugador(id) {
     const p = DB_JUGADORS.find(x => x.id === id); if(!p) return;
     document.getElementById('modal-fitxa-jugador').classList.remove('seccion-oculta');
@@ -361,7 +363,7 @@ function tancarModalJugador() { document.getElementById('modal-jugador').classLi
 function tancarFitxaJugador() { document.getElementById('modal-fitxa-jugador').classList.add('seccion-oculta'); }
 
 // ==========================================
-// 7. ACTES DE PARTIT I ELIMINACIÓ
+// 7. ACTES DE PARTIT I HISTORIAL
 // ==========================================
 function crearPartidoRapido() {
     const r = document.getElementById('partido-rival').value.trim(); if(!r) return;
@@ -396,7 +398,12 @@ function obrirGestioAvançadaPartit(id) {
     document.getElementById('det-partido-rival').innerText = "vs " + p.rival; 
     document.getElementById('det-partido-info').innerText = `${p.campo} | ${p.fecha} | ${p.hora}h [Cat: ${eqActiu.categoria.toUpperCase()}]`;
     document.getElementById('acta-valoracion').value = p.valoracio || ""; 
-    document.getElementById('acta-gols-rival-auto').innerText = p.golsRival || 0;
+    
+    // NOU: Carregar els gols del rival directament dins del quadre d'escriptura manual
+    if(document.getElementById('acta-gols-rival-manual-input')) {
+        document.getElementById('acta-gols-rival-manual-input').value = p.golsRival || 0;
+    }
+    
     document.getElementById('partido-sistema-joc').value = p.sistema || "1-2-3-1";
     
     mapPosicionsActuals = p.posicionsCamp || {}; llistaSubstitucionsTmp = p.subs || [];
@@ -450,6 +457,19 @@ function recalcularMarcadorsTotalsAutomàtics() {
     document.getElementById('acta-gols-nostres').innerText = n;
 }
 
+// NOU: Desar a la memòria a l'acte el número manual que escriguis als gols del rival
+function canviarGolsRivalDirecte(valor) {
+    const p = DB_PARTITS.find(x => x.id === partitIdActualGestio);
+    if (p) { 
+        p.golsRival = parseInt(valor) || 0; 
+        localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS)); 
+    }
+}
+
+function guardarValoracioTextualDirecta(txt) {
+    const p = DB_PARTITS.find(x => x.id === partitIdActualGestio); if(p) { p.valoracio = txt; localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS)); }
+}
+
 // ==========================================
 // 8. MOTOR DE DIBUIX DEL CAMP TÀCTIC (VERD)
 // ==========================================
@@ -494,12 +514,8 @@ function assignarJugadorAPosicioTactica(posicionId, jugadorId) {
     dibuixarCampTactics(); calcularMinutsAutomaticament();
 }
 
-function guardarValoracioTextualDirecta(txt) {
-    const p = DB_PARTITS.find(x => x.id === partitIdActualGestio); if(p) { p.valoracio = txt; localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS)); }
-}
-
 // ==========================================================================
-// 9. CÀLCUL DINÀMIC DE MINUTS ADAPTAT A LA CATEGORIA (PREBENJAMÍ, BENJAMÍ, ALEVÍ)
+// 9. CÀLCUL DINÀMIC DE MINUTS ADAPTAT A LA CATEGORIA
 // ==========================================================================
 function seleccionarQuartFitxa(q) {
     document.getElementById('cambio-quarto-actiu').value = q;
@@ -533,17 +549,15 @@ function renderitzarHistorialSubstitucionsVisual() {
 function calcularMinutsAutomaticament() {
     const p = DB_PARTITS.find(x => x.id === partitIdActualGestio); if(!p) return;
     
-    // 1. Llegim de quina categoria és l'equip per saber la durada oficial de cada quart
     const eqActiu = LLISTA_EQUIPS.find(x => x.id === EQUIP_ACTIU_ID) || { categoria: "benjami" };
     let duradaQuart = eqActiu.categoria === "prebenjami" ? 10 : eqActiu.categoria === "alevi" ? 15 : 12;
-    let minutsTotalsPartit = duradaQuart * 4; // 40, 48 o 60 minuts totals
+    let minutsTotalsPartit = duradaQuart * 4; 
     
     let tempsJugador = {};
     p.convocats.forEach(c => { tempsJugador[c.jugadorId] = 0; });
 
     let enCampActuals = Object.values(mapPosicionsActuals).filter(id => id !== "");
 
-    // 2. Simulem minut a minut segons la configuració dinàmica de l'equip
     for (let minut = 1; minut <= minutsTotalsPartit; minut++) {
         let saltDeQuart = "";
         if (minut === (duradaQuart + 1)) saltDeQuart = "2"; 
