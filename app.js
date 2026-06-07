@@ -2,20 +2,24 @@
 // 1. BASE DE DADES (LOCALSTORAGE) I CONFIGURACIÓ DE L'APLICACIÓ
 // ==========================================================================
 let CONFIG_CLUB = JSON.parse(localStorage.getItem('fc_config_multi')) || { nomClub: "INSTITUT LES CORTS" };
+
+// Llista d'equips dinàmica (si no n'hi ha, en fiquem dos de mostra per defecte)
 let LLISTA_EQUIPS = JSON.parse(localStorage.getItem('fc_equips_multi')) || [
     { id: "1eso-a", nom: "1r ESO - Grup A" }, 
     { id: "1eso-b", nom: "1r ESO - Grup B" }
 ];
-let DB_JUGADORS = JSON.parse(localStorage.getItem('fc_jugadors_multi')) || [];
-let DB_EXERCICIS = JSON.parse(localStorage.getItem('fc_exercicis_multi')) || []; 
-let DB_ENTRENAMENTS = JSON.parse(localStorage.getItem('fc_entrenaments_multi')) || [];
-let DB_PARTITS = JSON.parse(localStorage.getItem('fc_partits_multi')) || [];
 
-const USUARIS_CREDENTIALS = [
+// Credencials dinàmiques d'usuaris (si no n'hi ha, creem la base inicial)
+let USUARIS_CREDENTIALS = JSON.parse(localStorage.getItem('fc_usuaris_multi')) || [
     { email: "coordinador@club.com", pass: "1234", rol: "coordinador", equip_id: null },
     { email: "entrenadorA@club.com", pass: "1234", rol: "entrenador", equip_id: "1eso-a" },
     { email: "entrenadorB@club.com", pass: "1234", rol: "entrenador", equip_id: "1eso-b" }
 ];
+
+let DB_JUGADORS = JSON.parse(localStorage.getItem('fc_jugadors_multi')) || [];
+let DB_EXERCICIS = JSON.parse(localStorage.getItem('fc_exercicis_multi')) || []; 
+let DB_ENTRENAMENTS = JSON.parse(localStorage.getItem('fc_entrenaments_multi')) || [];
+let DB_PARTITS = JSON.parse(localStorage.getItem('fc_partits_multi')) || [];
 
 let USUARI_ACTIU = null; 
 let EQUIP_ACTIU_ID = ""; 
@@ -25,7 +29,7 @@ let mapPosicionsActuals = {};
 let llistaSubstitucionsTmp = [];
 
 // ==========================================================================
-// 1.B CONFIGURACIÓ DE GOOGLE FIREBASE INTERNA
+// 1.B CONFIGURACIÓ DE GOOGLE FIREBASE INTERNA (Ancoratge per al futur)
 // ==========================================================================
 const firebaseConfig = {
     apiKey: "AQUI_VA_LA_TEVA_API_KEY",
@@ -35,20 +39,9 @@ const firebaseConfig = {
     messagingSenderId: "1234567890",
     appId: "1:1234:web:abcd"
 };
-
-// Inicialitzem Firebase de forma segura només si les claus no són de prova
-let db = null;
-let storage = null;
-
+let db = null; let storage = null;
 if (typeof firebase !== 'undefined' && firebaseConfig.apiKey !== "AQUI_VA_LA_TEVA_API_KEY") {
-    try {
-        firebase.initializeApp(firebaseConfig);
-        db = firebase.firestore();
-        storage = firebase.storage();
-        console.log("Connectat a Firebase!");
-    } catch (e) {
-        console.error("Error Firebase:", e);
-    }
+    try { firebase.initializeApp(firebaseConfig); db = firebase.firestore(); storage = firebase.storage(); } catch (e) {}
 }
 
 // ==========================================
@@ -57,14 +50,15 @@ if (typeof firebase !== 'undefined' && firebaseConfig.apiKey !== "AQUI_VA_LA_TEV
 function executarLoginSimulat() {
     const email = document.getElementById('login-email').value.trim();
     const pass = document.getElementById('login-password').value;
-    const u = USUARIS_CREDENTIALS.find(x => x.email === email && x.pass === pass);
-    if (!u) { alert("Credencials incorrectes."); return; }
+    
+    const u = USUARIS_CREDENTIALS.find(x => x.email.toLowerCase() === email.toLowerCase() && x.pass === pass);
+    if (!u) { alert("Credencials incorrectes o l'equip no existeix."); return; }
     
     USUARI_ACTIU = u;
     if (USUARI_ACTIU.rol === 'coordinador') {
-        EQUIP_ACTIU_ID = LLISTA_EQUIPS[0].id; 
+        EQUIP_ACTIU_ID = LLISTA_EQUIPS[0] ? LLISTA_EQUIPS[0].id : ""; 
         document.getElementById('wrapper-selector-equips').classList.remove('hidden');
-        document.getElementById('selector-equip-coordinador').innerHTML = LLISTA_EQUIPS.map(e => `<option value="${e.id}">${e.nom}</option>`).join('');
+        actualitzarSelectorFiltreCoordinadorDinamit();
     } else {
         EQUIP_ACTIU_ID = USUARI_ACTIU.equip_id; 
         document.getElementById('wrapper-selector-equips').classList.add('hidden');
@@ -73,6 +67,14 @@ function executarLoginSimulat() {
     document.getElementById('interficie-app').classList.remove('seccion-oculta');
     aplicarConfiguracioInterficie(); 
     canviarEquipActiuGeneral();
+}
+
+function actualitzarSelectorFiltreCoordinadorDinamit() {
+    const selector = document.getElementById('selector-equip-coordinador');
+    if(selector) {
+        selector.innerHTML = LLISTA_EQUIPS.map(e => `<option value="${e.id}">${e.nom}</option>`).join('');
+        if(EQUIP_ACTIU_ID) selector.value = EQUIP_ACTIU_ID;
+    }
 }
 
 function executarLogout() {
@@ -92,7 +94,7 @@ function canviarEquipActiuCoordinador(id) {
 
 function canviarEquipActiuGeneral() {
     const eq = LLISTA_EQUIPS.find(e => e.id === EQUIP_ACTIU_ID);
-    document.getElementById('titol-plantilla-equip').innerText = eq ? eq.nom.toUpperCase() : "EQUIP";
+    document.getElementById('titol-plantilla-equip').innerText = eq ? eq.nom.toUpperCase() : "SENSE EQUIP ACTIU";
     renderitzarPlantilla(); 
     renderitzarPartits(); 
     renderitzarBibliotecaExercicis(); 
@@ -106,8 +108,12 @@ function aplicarConfiguracioInterficie() {
     document.getElementById('cfg-nom-club').value = CONFIG_CLUB.nomClub;
     document.getElementById('badge-rol-usuari').innerText = USUARI_ACTIU.rol.toUpperCase();
     
-    if(document.getElementById('cfg-nom-equip-a')) document.getElementById('cfg-nom-equip-a').value = LLISTA_EQUIPS[0].nom;
-    if(document.getElementById('cfg-nom-equip-b')) document.getElementById('cfg-nom-equip-b').value = LLISTA_EQUIPS[1].nom;
+    const panellAdmin = document.getElementById('cfg-panell-coordinador-equips');
+    if(panellAdmin) {
+        if(USUARI_ACTIU.rol === 'coordinador') panellAdmin.classList.remove('seccion-oculta');
+        else panellAdmin.classList.add('seccion-oculta');
+    }
+    renderitzarLlistaEquipsConfiguracio();
 }
 
 function cambiarPestana(p) {
@@ -124,57 +130,30 @@ function cambiarPestana(p) {
 }
 
 // ==========================================================================
-// 5. GESTIÓ DE LA BIBLIOTECA D'EXERCICIS AMB PUJADA DIRECTA AL STORAGE
+// 5. GESTIÓ DE LA BIBLIOTECA D'EXERCICIS
 // ==========================================================================
 async function crearEjercicioFirebase() {
     const n = document.getElementById('task-nombre').value.trim(); 
     const e = document.getElementById('task-explicacion').value.trim(); 
-    const arxiuImatge = document.getElementById('task-arxiu-imatge').files[0];
     const botoPujar = document.getElementById('btn-pujar-tasca');
     
     if (!n || !e) { alert("El nom i la descripció són obligatoris."); return; }
     
-    let URL_Imatge_Final = "";
-    
-    if (arxiuImatge && storage) {
-        try {
-            botoPujar.disabled = true;
-            botoPujar.innerText = "Pujant fitxer...";
-            
-            const rutaArxiu = `exercicis/img-${Date.now()}-${arxiuImatge.name}`;
-            const refStorage = storage.ref().child(rutaArxiu);
-            
-            const snapshot = await refStorage.put(arxiuImatge);
-            URL_Imatge_Final = await snapshot.ref.getDownloadURL();
-        } catch (error) {
-            console.error("Error en la pujada:", error);
-            alert("No s'ha pogut pujar el fitxer gràfic. Es desarà només el text.");
-        }
-    }
-
     const novaTasca = { 
         id: "ex-" + Date.now(), 
         nombre: n, 
         tipo: document.getElementById('task-tipo').value, 
-        imagen: URL_Imatge_Final, 
+        imagen: "", 
         explicacion: e, 
         creador: USUARI_ACTIU.email 
     };
-
-    if (db) {
-        try { await db.collection("exercicis").doc(novaTasca.id).set(novaTasca); } catch (err) {}
-    }
 
     DB_EXERCICIS.push(novaTasca);
     localStorage.setItem('fc_exercicis_multi', JSON.stringify(DB_EXERCICIS));
     
     document.getElementById('task-nombre').value = ""; 
-    document.getElementById('task-arxiu-imatge').value = "";
     document.getElementById('task-explicacion').value = "";
     
-    botoPujar.disabled = false;
-    botoPujar.innerHTML = `<i class="fas fa-cloud-upload-alt"></i> Desar a la Comunitat`;
-
     renderitzarBibliotecaExercicis(); 
     inicialitzarEstructuraSelectorsEntrenaments();
 }
@@ -189,26 +168,22 @@ function renderitzarBibliotecaExercicis() {
         g.innerHTML = `<p class="col-span-2 text-slate-500 text-center py-4 text-xs italic bg-slate-900 border border-slate-850 rounded-xl">Banc buit.</p>`; 
         return; 
     }
-    g.innerHTML = filtrats.map(e => {
-        const blocImatge = e.imagen ? `<div class="w-full h-32 rounded-lg overflow-hidden bg-slate-950 mb-3 border border-slate-850 shadow-inner"><img src="${e.imagen}" class="w-full h-full object-cover" alt="Esquema"></div>` : "";
-        return `
-            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between text-xs shadow-sm">
-                <div>
-                    <div class="flex justify-between border-b border-slate-850 pb-1.5 text-[10px] text-slate-500 mb-2">
-                        <span class="font-bold uppercase tracking-wider text-indigo-400">${e.tipo}</span>
-                        <span>Per: ${e.creador ? e.creador.split('@')[0] : 'Admin'}</span>
-                    </div>
-                    ${blocImatge}
-                    <h4 class="font-black text-white text-sm mt-1">${e.nombre}</h4>
-                    <p class="text-slate-400 mt-1 whitespace-pre-line leading-relaxed">${e.explicacion}</p>
+    g.innerHTML = filtrats.map(e => `
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between text-xs shadow-sm">
+            <div>
+                <div class="flex justify-between border-b border-slate-850 pb-1.5 text-[10px] text-slate-500 mb-2">
+                    <span class="font-bold uppercase tracking-wider text-indigo-400">${e.tipo}</span>
+                    <span>Per: ${e.creador ? e.creador.split('@')[0] : 'Admin'}</span>
                 </div>
-                <button onclick="DB_EXERCICIS=DB_EXERCICIS.filter(x=>x.id!=='${e.id}'); localStorage.setItem('fc_exercicis_multi', JSON.stringify(DB_EXERCICIS)); renderitzarBibliotecaExercicis();" class="text-slate-600 hover:text-rose-400 text-left pt-3 text-[10px] cursor-pointer mt-2 transition"><i class="fas fa-trash-alt mr-1"></i>Eliminar tasca</button>
-            </div>`;
-    }).join('');
+                <h4 class="font-black text-white text-sm mt-1">${e.nombre}</h4>
+                <p class="text-slate-400 mt-1 whitespace-pre-line leading-relaxed">${e.explicacion}</p>
+            </div>
+            <button onclick="DB_EXERCICIS=DB_EXERCICIS.filter(x=>x.id!=='${e.id}'); localStorage.setItem('fc_exercicis_multi', JSON.stringify(DB_EXERCICIS)); renderitzarBibliotecaExercicis();" class="text-slate-600 hover:text-rose-400 text-left pt-3 text-[10px] cursor-pointer mt-2 transition"><i class="fas fa-trash-alt mr-1"></i>Eliminar tasca</button>
+        </div>`).join('');
 }
 
 // ==========================================
-// 6. GESTIÓ DE SESSIONS D'ENTRENAMENT I ASSISTÈNCIA
+// 6. GESTIÓ DE SESSIONS I ASSISTÈNCIA
 // ==========================================
 function inicialitzarEstructuraSelectorsEntrenaments() {
     const t = ["Tots", "Roda de passades", "Coordinació", "Rondos", "Possessions", "Partits"];
@@ -264,13 +239,13 @@ function renderitzarEntrenaments() {
         return; 
     }
     l.innerHTML = f.map(e => `
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex justify-between items-center text-xs shadow-sm">
+        <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex justify-between items-center text-xs shadow-sm">
             <div>
                 <span class="bg-indigo-950 border border-indigo-900 px-2 py-0.5 rounded text-indigo-400 font-bold mr-2">Sessió #${e.numeroSessio}</span>
                 <span class="font-bold text-white">${e.fecha}</span> - ${e.objetivo}
             </div>
             <div class="flex items-center space-x-2">
-                <button onclick="obrirGestioAsistenciaSessio('${e.id}')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-1.5 rounded-lg cursor-pointer transition shadow">Veure Sessió i Llista</button>
+                <button onclick="obrirGestioAsistenciaSessio('${e.id}')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-1.5 rounded-lg cursor-pointer transition">Veure Sessió i Llista</button>
                 <button onclick="DB_ENTRENAMENTS=DB_ENTRENAMENTS.filter(x=>x.id!=='${e.id}'); localStorage.setItem('fc_entrenaments_multi', JSON.stringify(DB_ENTRENAMENTS)); renderitzarEntrenaments();" class="text-slate-500 hover:text-rose-400 p-1 cursor-pointer"><i class="fas fa-trash-alt"></i></button>
             </div>
         </div>`).join('');
@@ -293,13 +268,11 @@ function obrirGestioAsistenciaSessio(idEntrenament) {
         contenedorTasques.innerHTML = entreno.tasquesIds.map((id, idx) => {
             const ex = DB_EXERCICIS.find(x => x.id === id);
             if (!ex) return "";
-            const blocImatgeIntern = ex.imagen ? `<div class="w-full h-28 rounded-lg overflow-hidden bg-slate-950 my-2 border border-slate-900"><img src="${ex.imagen}" class="w-full h-full object-cover"></div>` : "";
             return `
                 <div class="bg-slate-950 p-3 rounded-xl border border-slate-850 space-y-1 text-xs shadow-md">
                     <div class="flex justify-between text-[10px] text-slate-500 border-b border-slate-900 pb-0.5">
                         <span class="font-bold text-indigo-400">Tasca ${idx + 1}</span><span class="bg-slate-900 px-1.5 py-0.5 rounded font-medium">${ex.tipo}</span>
                     </div>
-                    ${blocImatgeIntern}
                     <h4 class="font-black text-white text-sm mt-1">${ex.nombre}</h4>
                     <p class="text-slate-400 whitespace-pre-line leading-relaxed">${ex.explicacion}</p>
                 </div>`;
@@ -309,7 +282,7 @@ function obrirGestioAsistenciaSessio(idEntrenament) {
     const alumnes = DB_JUGADORS.filter(x => x.equip_id === EQUIP_ACTIU_ID);
     const tbody = document.getElementById('tabla-asistencia-sesion-interna');
     if (alumnes.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="2" class="p-4 text-center text-xs text-slate-500 italic">No hi ha alumnes actius.</td></tr>`;
+        tbody.innerHTML = `<tr><td class="p-4 text-center text-xs text-slate-500 italic">No hi ha alumnes actius.</td></tr>`;
         return;
     }
 
@@ -336,9 +309,9 @@ function canviarEstatBotoAssistènciaInterna(jugadorId, nouEstat) {
         const btn = document.getElementById(`btn-asis-int-${jugadorId}-${e}`);
         if (btn) {
             if (e === nouEstat) {
-                if (e === 'P') btn.className = "px-2 py-0.5 rounded bg-emerald-600 text-white shadow cursor-pointer font-bold text-[10px]";
-                if (e === 'A') btn.className = "px-2 py-0.5 rounded bg-rose-600 text-white shadow cursor-pointer font-bold text-[10px]";
-                if (e === 'J') btn.className = "px-2 py-0.5 rounded bg-amber-500 text-slate-950 shadow cursor-pointer font-bold text-[10px]";
+                if (e === 'P') btn.className = "px-2 py-0.5 rounded bg-emerald-600 text-white shadow font-bold text-[10px]";
+                if (e === 'A') btn.className = "px-2 py-0.5 rounded bg-rose-600 text-white shadow font-bold text-[10px]";
+                if (e === 'J') btn.className = "px-2 py-0.5 rounded bg-amber-500 text-slate-950 shadow font-bold text-[10px]";
             } else {
                 btn.className = "px-2 py-0.5 rounded text-slate-400 font-bold text-[10px]";
             }
@@ -367,7 +340,7 @@ function desarAsistenciaSessióActual() {
 }
 
 // ==========================================
-// 7. GESTIÓ COMPLETA DE LA PLANTILLA (ALUMNAT)
+// 7. GESTIÓ DE LA PLANTILLA (ALUMNAT)
 // ==========================================
 function renderitzarPlantilla() {
     const tbody = document.getElementById('tabla-jugadores'); 
@@ -584,7 +557,7 @@ function seleccionarQuartFitxa(q) {
     document.getElementById('cambio-quarto-actiu').value = q;
     [2, 3, 4, 'int4'].forEach(s => {
         const b = document.getElementById(`btn-q-${s}`);
-        if(b) b.className = (s === q) ? "py-1 bg-teal-600 text-white font-mono font-bold text-xs rounded border border-teal-500 shadow-sm cursor-pointer" : "py-1 bg-slate-800 text-slate-400 font-mono font-bold text-xs rounded border border-slate-700";
+        if(b) b.className = (s === q) ? "py-1 bg-teal-600 text-white font-mono font-bold text-xs rounded border border-teal-500 shadow-sm" : "py-1 bg-slate-800 text-slate-400 font-mono font-bold text-xs rounded border border-slate-700";
     });
     if(q === 'int4') document.getElementById('wrapper-minuto-q4').classList.remove('seccion-oculta');
     else document.getElementById('wrapper-minuto-q4').classList.add('seccion-oculta');
@@ -627,7 +600,7 @@ function renderitzarHistorialSubstitucionsVisual() {
     h.innerHTML = llistaSubstitucionsTmp.map((s, idx) => `
         <div class="flex justify-between items-center bg-slate-950 p-1.5 border border-slate-850 rounded font-mono text-[10px] text-slate-300">
             <span>${s.text}</span>
-            <button onclick="llistaSubstitucionsTmp.splice(${idx},1); renderitzarHistorialSubstitucionsVisual(); calcularMinutsAutomaticament();" class="text-rose-400 font-bold px-1 cursor-pointer">✕</button>
+            <button onclick="llistaSubstitucionsTmp.splice(${idx},1); renderitzarHistorialSubstitucionsVisual(); calcularMinutsAutomaticament();" class="text-rose-400 font-bold px-1">✕</button>
         </div>`).join('');
 }
 
@@ -636,7 +609,6 @@ function calcularMinutsAutomaticament() {
     let mAcum = {}; 
     p.convocats.forEach(c => { mAcum[c.jugadorId] = 0; });
     
-    // Repartiment estimat adaptat a Futbol 7 escolar (48 minuts totals de joc)
     p.convocats.forEach((c, idx) => {
         let minsBase = 24; 
         llistaSubstitucionsTmp.forEach(sub => {
@@ -644,7 +616,6 @@ function calcularMinutsAutomaticament() {
             if(sub.entra === c.jugadorId) minsBase += 6;
         });
         c.minuts = Math.max(0, Math.min(48, minsBase));
-        
         const badge = document.getElementById(`badge-minuts-${c.jugadorId}`);
         if(badge) badge.innerText = `${c.minuts} min`;
     });
@@ -652,7 +623,7 @@ function calcularMinutsAutomaticament() {
 }
 
 // ==========================================
-// 10. PANEL ANALÍSTIC D'ESTADÍSTIQUES TOTALS
+// 10. PANEL D'ESTADÍSTIQUES TOTALS
 // ==========================================
 function calcularIAnalisarEstadistiquesGlobals() {
     const partits = DB_PARTITS.filter(x => x.equip_id === EQUIP_ACTIU_ID); 
@@ -687,7 +658,6 @@ function calcularIAnalisarEstadistiquesGlobals() {
     document.getElementById('stat-gols-contra').innerText = contra; 
     document.getElementById('stat-total-encontres').innerText = partits.length;
     document.getElementById('stat-partidos-ganados').innerText = guanyats; 
-    document.getElementById('stat-partidos-text-empatados', empatats); // Guardat segur
     document.getElementById('stat-partidos-empatados').innerText = empatats;
     document.getElementById('stat-partidos-perdidos').innerText = perduts;
     
@@ -712,23 +682,97 @@ function calcularIAnalisarEstadistiquesGlobals() {
 }
 
 // ==========================================
-// 11. CONFIGURACIÓ DE CENTRE
+// 11. PANEL GESTIÓ DINÀMICA D'EQUIPS (COORDINADOR)
 // ==========================================
 function actualitzarConfiguracioEntitat() {
     const nouNomClub = document.getElementById('cfg-nom-club').value.trim();
-    const nouGrupA = document.getElementById('cfg-nom-equip-a').value.trim(); 
-    const nouGrupB = document.getElementById('cfg-nom-equip-b').value.trim();
-    if (!nouNomClub || !nouGrupA || !nouGrupB) return;
-
+    if (!nouNomClub) return;
     CONFIG_CLUB.nomClub = nouNomClub; 
-    LLISTA_EQUIPS[0].nom = nouGrupA; 
-    LLISTA_EQUIPS[1].nom = nouGrupB;
-    
     localStorage.setItem('fc_config_multi', JSON.stringify(CONFIG_CLUB)); 
+    document.getElementById('nav-nom-club').innerText = CONFIG_CLUB.nomClub.toUpperCase();
+    alert("Nom de la institució actualitzat!");
+}
+
+function crearEquipIDosierDinamic() {
+    const nomEquip = document.getElementById('cfg-nou-equip-nom').value.trim();
+    const emailEntrenador = document.getElementById('cfg-nou-equip-email').value.trim();
+    const passEntrenador = document.getElementById('cfg-nou-equip-pass').value;
+
+    if (!nomEquip || !emailEntrenador || !passEntrenador) {
+        alert("Siusplau, omple tots els camps (Nom, Email i Contrasenya).");
+        return;
+    }
+
+    if (USUARIS_CREDENTIALS.some(x => x.email.toLowerCase() === emailEntrenador.toLowerCase())) {
+        alert("Aquest correu electrònic ja existeix al sistema.");
+        return;
+    }
+
+    const nouIdEquip = "eq-" + Date.now();
+
+    // 1. Guardar l'equip a la llista
+    LLISTA_EQUIPS.push({ id: nouIdEquip, nom: nomEquip });
     localStorage.setItem('fc_equips_multi', JSON.stringify(LLISTA_EQUIPS));
-    aplicarConfiguracioInterficie();
-    alert("Configuració de centre desada!");
+
+    // 2. Crear les credencials de l'entrenador enllaçades
+    USUARIS_CREDENTIALS.push({
+        email: emailEntrenador,
+        pass: passEntrenador,
+        rol: "entrenador",
+        equip_id: nouIdEquip
+    });
+    localStorage.setItem('fc_usuaris_multi', JSON.stringify(USUARIS_CREDENTIALS));
+
+    document.getElementById('cfg-nou-equip-nom').value = "";
+    document.getElementById('cfg-nou-equip-email').value = "";
+    document.getElementById('cfg-nou-equip-pass').value = "";
+
+    alert(`Equip "${nomEquip}" donat d'alta correctament!`);
+    
+    actualitzarSelectorFiltreCoordinadorDinamit();
+    renderitzarLlistaEquipsConfiguracio();
+}
+
+function renderitzarLlistaEquipsConfiguracio() {
+    const cont = document.getElementById('cfg-llista-equips-sistema');
+    if(!cont) return;
+
+    if(LLISTA_EQUIPS.length === 0) {
+        cont.innerHTML = `<p class="text-[11px] text-slate-500 italic">No hi ha equips creats.</p>`;
+        return;
+    }
+
+    cont.innerHTML = LLISTA_EQUIPS.map(e => {
+        const creds = USUARIS_CREDENTIALS.find(u => u.equip_id === e.id) || { email: "Sense accés", pass: "-" };
+        return `
+            <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-850 flex justify-between items-center text-[11px]">
+                <div>
+                    <div class="font-bold text-white mb-0.5">${e.nom}</div>
+                    <div class="text-slate-400 text-[10px]">Accés: <span class="text-indigo-400 font-mono">${creds.email}</span> | Clau: <span class="text-slate-500 font-mono">${creds.pass}</span></div>
+                </div>
+                <button onclick="eliminarEquipDelSistema('${e.id}')" class="text-slate-500 hover:text-rose-400 p-1 cursor-pointer transition">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>`;
+    }).join('');
+}
+
+function eliminarEquipDelSistema(idEquip) {
+    if(!confirm("Estàs segur d'eliminar aquest equip i el seu usuari?")) return;
+
+    LLISTA_EQUIPS = LLISTA_EQUIPS.filter(x => x.id !== idEquip);
+    USUARIS_CREDENTIALS = USUARIS_CREDENTIALS.filter(x => x.equip_id !== idEquip);
+
+    localStorage.setItem('fc_equips_multi', JSON.stringify(LLISTA_EQUIPS));
+    localStorage.setItem('fc_usuaris_multi', JSON.stringify(USUARIS_CREDENTIALS));
+
+    if(EQUIP_ACTIU_ID === idEquip) {
+        EQUIP_ACTIU_ID = LLISTA_EQUIPS[0] ? LLISTA_EQUIPS[0].id : "";
+    }
+
+    actualitzarSelectorFiltreCoordinadorDinamit();
     canviarEquipActiuGeneral();
+    renderitzarLlistaEquipsConfiguracio();
 }
 
 // ==========================================
