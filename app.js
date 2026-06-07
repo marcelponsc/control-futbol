@@ -322,7 +322,6 @@ function renderitzarPartits() {
     const c = document.getElementById('lista-partidos'); const f = DB_PARTITS.filter(x => x.equip_id === EQUIP_ACTIU_ID);
     if(f.length === 0) { c.innerHTML = `<p class="text-xs text-slate-500 text-center py-4 bg-slate-900 border border-slate-850 rounded-xl italic">Cap acta oberta.</p>`; return; }
     
-    // RENDERITZAT INTEGRAT AMB EL BOTÓ D'ELIMINAR ACTA (PAPERERA)
     c.innerHTML = f.map(p => `
         <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex justify-between items-center text-xs">
             <div><b class="text-white">vs ${p.rival}</b> (${p.fecha || 'S/D'})</div>
@@ -349,7 +348,7 @@ function obrirGestioAvançadaPartit(id) {
     if (!p.convocats) p.convocats = [];
     
     renderitzarLlistaConvocatoriaActa(); recalcularMarcadorsTotalsAutomàtics(); 
-    seleccionarQuartFitxa(2); dibuixarCampTactics(); 
+    seleccionarQuartFitxa('2'); dibuixarCampTactics(); 
     calcularMinutsAutomaticament(); actualitzarSelectorsDeCanvi(); renderitzarHistorialSubstitucionsVisual();
 }
 
@@ -394,6 +393,11 @@ function actualitzarGolsConvocat(jugadorId, valor) {
 function recalcularMarcadorsTotalsAutomàtics() {
     let n = 0; DB_JUGADORS.filter(x => x.equip_id === EQUIP_ACTIU_ID).forEach(j => { let g = document.getElementById(`num-gols-${j.id}`); if(g) n += parseInt(g.value) || 0; });
     document.getElementById('acta-gols-nostres').innerText = n;
+}
+
+function guardarValoracioTextualDirecta(txt) {
+    const p = DB_PARTITS.find(x => x.id === partitIdActualGestio);
+    if(p) { p.valoracio = txt; localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS)); }
 }
 
 // ==========================================
@@ -445,7 +449,7 @@ function assignarJugadorAPosicioTactica(posicionId, jugadorId) {
 // ==========================================
 function seleccionarQuartFitxa(q) {
     document.getElementById('cambio-quarto-actiu').value = q;
-    [2, 3, 4, 'int4'].forEach(s => { const b = document.getElementById(`btn-q-${s}`); if(b) b.className = (s === q) ? "py-1 bg-teal-600 text-white font-mono font-bold text-xs rounded border border-teal-500 shadow-sm cursor-pointer" : "py-1 bg-slate-800 text-slate-400 font-mono font-bold text-xs rounded border border-slate-700"; });
+    ['2', '3', '4', 'int4'].forEach(s => { const b = document.getElementById(`btn-q-${s}`); if(b) b.className = (s === q) ? "py-1 bg-teal-600 text-white font-mono font-bold text-xs rounded border border-teal-500 shadow-sm cursor-pointer" : "py-1 bg-slate-800 text-slate-400 font-mono font-bold text-xs rounded border border-slate-700"; });
     if(q === 'int4') document.getElementById('wrapper-minuto-q4').classList.remove('seccion-oculta'); else document.getElementById('wrapper-minuto-q4').classList.add('seccion-oculta');
 }
 
@@ -458,16 +462,19 @@ function actualitzarSelectorsDeCanvi() {
 function afegirSubstitucioCronologica() {
     const q = document.getElementById('cambio-quarto-actiu').value; const sId = document.getElementById('cambio-sale-select').value; const eId = document.getElementById('cambio-entra-select').value;
     if(!sId || !eId || sId === eId) { alert("Tria dos alumnes diferents."); return; }
-    let t = q === '2' ? "Inici Q2 (12')" : q === '3' ? "Inici Q3 (24')" : q === '4' ? "Inici Q4 (36')" : `Min ${document.getElementById('cambio-minuto-real').value}'`;
+    
+    // FORMAT DE TEXT EVOLUTIU DEMANAT: Q1 -> Q2, Q2 -> Q3, Q3 -> Q4
+    let etiquetaFormatada = q === '2' ? "Q1 ➔ Q2" : q === '3' ? "Q2 ➔ Q3" : q === '4' ? "Q3 ➔ Q4" : `Min ${document.getElementById('cambio-minuto-real').value}'`;
     const jS = DB_JUGADORS.find(x => x.id === sId); const jE = DB_JUGADORS.find(x => x.id === eId);
-    llistaSubstitucionsTmp.push({ quarto: q, sale: sId, entra: eId, text: `${t}: ❌ #${jS.dorsal || '0'} ➔ ✅ #${jE.dorsal || '0'}` });
+    
+    llistaSubstitucionsTmp.push({ quarto: q, sale: sId, entra: eId, text: `[${etiquetaFormatada}] ❌ #${jS.dorsal || '0'} ➔ ✅ #${jE.dorsal || '0'}` });
     const p = DB_PARTITS.find(x => x.id === partitIdActualGestio); if(p) { p.subs = llistaSubstitucionsTmp; localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS)); }
     renderitzarHistorialSubstitucionsVisual(); calcularMinutsAutomaticament();
 }
 
 function renderitzarHistorialSubstitucionsVisual() {
-    const h = document.getElementById('historial-cambios-linea'); if(llistaSubstitucionsTmp.length === 0) { h.innerHTML = `<p class="text-slate-600 italic text-[11px]">Cap canvi.</p>`; return; }
-    h.innerHTML = llistaSubstitucionsTmp.map((s, idx) => `<div class="flex justify-between items-center bg-slate-950 p-1.5 border border-slate-850 rounded font-mono text-[10px] text-slate-300"><span>${s.text}</span><button onclick="llistaSubstitucionsTmp.splice(${idx},1); renderitzarHistorialSubstitucionsVisual(); calcularMinutsAutomaticament();" class="text-rose-400 font-bold px-1">✕</button></div>`).join('');
+    const h = document.getElementById('historial-cambios-linea'); if(llistaSubstitucionsTmp.length === 0) { h.innerHTML = `<p class="text-slate-600 italic text-[11px]">Cap canvi configurat.</p>`; return; }
+    h.innerHTML = llistaSubstitucionsTmp.map((s, idx) => `<div class="flex justify-between items-center bg-slate-950 p-1.5 border border-slate-850 rounded font-mono text-[10px] text-slate-300"><span>${s.text}</span><button onclick="llistaSubstitucionsTmp.splice(${idx},1); renderitzarHistorialSubstitucionsVisual(); calcularMinutsAutomaticament();" class="text-rose-400 font-bold px-1 cursor-pointer">✕</button></div>`).join('');
 }
 
 function calcularMinutsAutomaticament() {
@@ -484,6 +491,11 @@ function calcularMinutsAutomaticament() {
         const badge = document.getElementById(`badge-minuts-${c.jugadorId}`); if(badge) badge.innerText = `${c.minuts} min`;
     });
     localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS));
+}
+
+function canviarGolsRivalDirecte(v) {
+    const p = DB_PARTITS.find(x => x.id === partitIdActualGestio);
+    if(p) { p.golsRival = parseInt(v) || 0; localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS)); }
 }
 
 // ==========================================
@@ -536,7 +548,6 @@ function crearEquipIDosierDinamic() {
     alert(`Equip "${nomEquip}" donat d'alta!`); actualitzarSelectorFiltreCoordinadorDinamit(); renderitzarLlistaEquipsConfiguracio();
 }
 
-// ... Las funciones auxiliares finales (renderitzarLlistaEquips, eliminarEquip, timeout) siguen operativas ...
 function renderitzarLlistaEquipsConfiguracio() {
     const cont = document.getElementById('cfg-llista-equips-sistema'); if(!cont) return;
     if(LLISTA_EQUIPS.length === 0) { cont.innerHTML = `<p class="text-[11px] text-slate-500 italic">No hi ha equips.</p>`; return; }
