@@ -3,9 +3,10 @@
 // ==========================================================================
 let CONFIG_CLUB = JSON.parse(localStorage.getItem('fc_config_multi')) || { nomClub: "INSTITUT LES CORTS" };
 
+// Llista d'equips inicials amb la seva categoria per defecte (aleví = 15' per quart)
 let LLISTA_EQUIPS = JSON.parse(localStorage.getItem('fc_equips_multi')) || [
-    { id: "1eso-a", nom: "1r ESO - Grup A" }, 
-    { id: "1eso-b", nom: "1r ESO - Grup B" }
+    { id: "1eso-a", nom: "1r ESO - Grup A", categoria: "benjami" }, 
+    { id: "1eso-b", nom: "1r ESO - Grup B", categoria: "benjami" }
 ];
 
 let USUARIS_CREDENTIALS = JSON.parse(localStorage.getItem('fc_usuaris_multi')) || [
@@ -360,7 +361,7 @@ function tancarModalJugador() { document.getElementById('modal-jugador').classLi
 function tancarFitxaJugador() { document.getElementById('modal-fitxa-jugador').classList.add('seccion-oculta'); }
 
 // ==========================================
-// 7. ACTES DE PARTIT I RECOMPTE DE MINUTS
+// 7. ACTES DE PARTIT I ELIMINACIÓ
 // ==========================================
 function crearPartidoRapido() {
     const r = document.getElementById('partido-rival').value.trim(); if(!r) return;
@@ -377,7 +378,7 @@ function renderitzarPartits() {
             <div><b class="text-white">vs ${p.rival}</b> (${p.fecha || 'S/D'})</div>
             <div class="flex items-center space-x-2">
                 <button onclick="obrirGestioAvançadaPartit('${p.id}')" class="bg-indigo-600 text-white font-bold px-3 py-1.5 rounded-lg cursor-pointer">Obrir Acta</button>
-                <button onclick="if(confirm('Vols eliminar aquesta acta de partit?')) { DB_PARTITS = DB_PARTITS.filter(x => x.id !== '${p.id}'); localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS)); renderitzarPartits(); }" class="text-slate-500 hover:text-rose-400 p-2 cursor-pointer transition">
+                <button onclick="if(confirm('Vols eliminar aquesta acta?')) { DB_PARTITS = DB_PARTITS.filter(x => x.id !== '${p.id}'); localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS)); renderitzarPartits(); }" class="text-slate-500 hover:text-rose-400 p-2 cursor-pointer transition">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             </div>
@@ -388,8 +389,12 @@ function obrirGestioAvançadaPartit(id) {
     const p = DB_PARTITS.find(x => x.id === id); if(!p) return;
     partitIdActualGestio = id; cambiarPestana('detalles-partido');
     
+    const eqActiu = LLISTA_EQUIPS.find(x => x.id === EQUIP_ACTIU_ID) || { categoria: "benjami" };
+    let minPerQuart = eqActiu.categoria === "prebenjami" ? 10 : eqActiu.categoria === "alevi" ? 15 : 12;
+    if(document.getElementById('cfg-text-limit-minuts')) document.getElementById('cfg-text-limit-minuts').innerText = `1-${minPerQuart * 4}`;
+
     document.getElementById('det-partido-rival').innerText = "vs " + p.rival; 
-    document.getElementById('det-partido-info').innerText = `${p.campo} | ${p.fecha} | ${p.hora}h`;
+    document.getElementById('det-partido-info').innerText = `${p.campo} | ${p.fecha} | ${p.hora}h [Cat: ${eqActiu.categoria.toUpperCase()}]`;
     document.getElementById('acta-valoracion').value = p.valoracio || ""; 
     document.getElementById('acta-gols-rival-auto').innerText = p.golsRival || 0;
     document.getElementById('partido-sistema-joc').value = p.sistema || "1-2-3-1";
@@ -445,10 +450,6 @@ function recalcularMarcadorsTotalsAutomàtics() {
     document.getElementById('acta-gols-nostres').innerText = n;
 }
 
-function guardarValoracioTextualDirecta(txt) {
-    const p = DB_PARTITS.find(x => x.id === partitIdActualGestio); if(p) { p.valoracio = txt; localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS)); }
-}
-
 // ==========================================
 // 8. MOTOR DE DIBUIX DEL CAMP TÀCTIC (VERD)
 // ==========================================
@@ -493,8 +494,12 @@ function assignarJugadorAPosicioTactica(posicionId, jugadorId) {
     dibuixarCampTactics(); calcularMinutsAutomaticament();
 }
 
+function guardarValoracioTextualDirecta(txt) {
+    const p = DB_PARTITS.find(x => x.id === partitIdActualGestio); if(p) { p.valoracio = txt; localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS)); }
+}
+
 // ==========================================================================
-// 9. CÀLCUL CRONOLÒGIC DE ROTACIONS I MINUTS DE JOC ESCOLARS (CORREGIT)
+// 9. CÀLCUL DINÀMIC DE MINUTS ADAPTAT A LA CATEGORIA (PREBENJAMÍ, BENJAMÍ, ALEVÍ)
 // ==========================================================================
 function seleccionarQuartFitxa(q) {
     document.getElementById('cambio-quarto-actiu').value = q;
@@ -528,16 +533,22 @@ function renderitzarHistorialSubstitucionsVisual() {
 function calcularMinutsAutomaticament() {
     const p = DB_PARTITS.find(x => x.id === partitIdActualGestio); if(!p) return;
     
+    // 1. Llegim de quina categoria és l'equip per saber la durada oficial de cada quart
+    const eqActiu = LLISTA_EQUIPS.find(x => x.id === EQUIP_ACTIU_ID) || { categoria: "benjami" };
+    let duradaQuart = eqActiu.categoria === "prebenjami" ? 10 : eqActiu.categoria === "alevi" ? 15 : 12;
+    let minutsTotalsPartit = duradaQuart * 4; // 40, 48 o 60 minuts totals
+    
     let tempsJugador = {};
     p.convocats.forEach(c => { tempsJugador[c.jugadorId] = 0; });
 
     let enCampActuals = Object.values(mapPosicionsActuals).filter(id => id !== "");
 
-    for (let minut = 1; minut <= 48; minut++) {
+    // 2. Simulem minut a minut segons la configuració dinàmica de l'equip
+    for (let minut = 1; minut <= minutsTotalsPartit; minut++) {
         let saltDeQuart = "";
-        if (minut === 13) saltDeQuart = "2"; 
-        if (minut === 25) saltDeQuart = "3"; 
-        if (minut === 37) saltDeQuart = "4"; 
+        if (minut === (duradaQuart + 1)) saltDeQuart = "2"; 
+        if (minut === (duradaQuart * 2 + 1)) saltDeQuart = "3"; 
+        if (minut === (duradaQuart * 3 + 1)) saltDeQuart = "4"; 
 
         if (saltDeQuart !== "") {
             llistaSubstitucionsTmp.forEach(sub => {
@@ -550,7 +561,7 @@ function calcularMinutsAutomaticament() {
 
         llistaSubstitucionsTmp.forEach(sub => {
             if (sub.quarto === 'int4') {
-                let mCanvi = parseInt(document.getElementById('cambio-minuto-real')?.value) || 42;
+                let mCanvi = parseInt(document.getElementById('cambio-minuto-real')?.value) || 30;
                 if (minut === mCanvi) {
                     enCampActuals = enCampActuals.filter(id => id !== sub.sale);
                     if (!enCampActuals.includes(sub.entra)) enCampActuals.push(sub.entra);
@@ -593,7 +604,11 @@ function calcularIAnalisarEstadistiquesGlobals() {
     document.getElementById('stat-tabla-completa-jugadores').innerHTML = jugadors.map(j => {
         let partitsConvocat = mConvocat[j.id] || 0; let minutsTotals = mMinutsTotals[j.id] || 0;
         let minutsPerPartitConvocat = partitsConvocat > 0 ? (minutsTotals / partitsConvocat).toFixed(1) : "0.0";
-        let percentatgeMinuts = partitsConvocat > 0 ? ((minutsTotals / (partitsConvocat * 48)) * 100).toFixed(0) : "0";
+        
+        const eqActiu = LLISTA_EQUIPS.find(x => x.id === EQUIP_ACTIU_ID) || { categoria: "benjami" };
+        let totalMaxPartit = eqActiu.categoria === "prebenjami" ? 40 : eqActiu.categoria === "alevi" ? 60 : 48;
+        let percentatgeMinuts = partitsConvocat > 0 ? ((minutsTotals / (partitsConvocat * totalMaxPartit)) * 100).toFixed(0) : "0";
+        
         return `<tr class="border-b border-slate-850 text-center text-xs hover:bg-slate-900/40"><td class="p-2.5 text-left font-semibold text-white pl-4">#${j.dorsal || '0'} - ${j.nombre}</td><td>${partitsConvocat}</td><td class="text-amber-500 font-bold">${partitsConvocat > 0 ? Math.round(partitsConvocat*0.6) : 0}</td><td class="text-teal-400 font-bold">${partitsConvocat > 0 ? Math.round(partitsConvocat*0.4) : 0}</td><td class="text-indigo-400 font-bold">${minutsTotals} min</td><td>${minutsPerPartitConvocat} m</td><td class="text-sky-400 font-black">${percentatgeMinuts}%</td><td class="text-emerald-400 font-black">${mGols[j.id] || 0}</td></tr>`;
     }).join('');
 }
@@ -608,17 +623,27 @@ function actualitzarConfiguracioEntitat() {
 }
 
 function crearEquipIDosierDinamic() {
-    const nomEquip = document.getElementById('cfg-nou-equip-nom').value.trim(); const emailEntrenador = document.getElementById('cfg-nou-equip-email').value.trim(); const passEntrenador = document.getElementById('cfg-nou-equip-pass').value;
+    const nomEquip = document.getElementById('cfg-nou-equip-nom').value.trim(); 
+    const categoriaEquip = document.getElementById('cfg-nou-equip-categoria').value;
+    const emailEntrenador = document.getElementById('cfg-nou-equip-email').value.trim(); 
+    const passEntrenador = document.getElementById('cfg-nou-equip-pass').value;
+
     if (!nomEquip || !emailEntrenador || !passEntrenador) { alert("Siusplau, omple tots els camps."); return; }
     if (USUARIS_CREDENTIALS.some(x => x.email.toLowerCase() === emailEntrenador.toLowerCase())) { alert("Aquest correu electrònic ja existeix."); return; }
 
     const nouIdEquip = "eq-" + Date.now();
-    LLISTA_EQUIPS.push({ id: nouIdEquip, nom: nomEquip }); localStorage.setItem('fc_equips_multi', JSON.stringify(LLISTA_EQUIPS));
-    USUARIS_CREDENTIALS.push({ email: emailEntrenador, pass: passEntrenador, font: "entrenador", rol: "entrenador", equip_id: nouIdEquip });
+    LLISTA_EQUIPS.push({ id: nouIdEquip, nom: nomEquip, categoria: categoriaEquip }); 
+    localStorage.setItem('fc_equips_multi', JSON.stringify(LLISTA_EQUIPS));
+    
+    USUARIS_CREDENTIALS.push({ email: emailEntrenador, pass: passEntrenador, rol: "entrenador", equip_id: nouIdEquip });
     localStorage.setItem('fc_usuaris_multi', JSON.stringify(USUARIS_CREDENTIALS));
 
-    document.getElementById('cfg-nou-equip-nom').value = ""; document.getElementById('cfg-nou-equip-email').value = ""; document.getElementById('cfg-nou-equip-pass').value = "";
-    alert(`Equip "${nomEquip}" donat d'alta!`); actualitzarSelectorFiltreCoordinadorDinamit(); renderitzarLlistaEquipsConfiguracio();
+    document.getElementById('cfg-nou-equip-nom').value = ""; 
+    document.getElementById('cfg-nou-equip-email').value = ""; 
+    document.getElementById('cfg-nou-equip-pass').value = "";
+    
+    alert(`Equip "${nomEquip}" [${categoriaEquip.toUpperCase()}] donat d'alta!`); 
+    actualitzarSelectorFiltreCoordinadorDinamit(); renderitzarLlistaEquipsConfiguracio();
 }
 
 function renderitzarLlistaEquipsConfiguracio() {
@@ -626,7 +651,8 @@ function renderitzarLlistaEquipsConfiguracio() {
     if(LLISTA_EQUIPS.length === 0) { cont.innerHTML = `<p class="text-[11px] text-slate-500 italic">No hi ha equips.</p>`; return; }
     cont.innerHTML = LLISTA_EQUIPS.map(e => {
         const creds = USUARIS_CREDENTIALS.find(u => u.equip_id === e.id) || { email: "Sense accés", pass: "-" };
-        return `<div class="bg-slate-950 p-2.5 rounded-xl border border-slate-850 flex justify-between items-center text-[11px]"><div><div class="font-bold text-white mb-0.5">${e.nom}</div><div class="text-slate-400 text-[10px]">Accés: <span class="text-indigo-400 font-mono">${creds.email}</span> | Clau: <span class="text-slate-500 font-mono">${creds.pass}</span></div></div><button onclick="eliminarEquipDelSistema('${e.id}')" class="text-slate-500 hover:text-rose-400 p-1 cursor-pointer"><i class="fas fa-trash-alt"></i></button></div>`;
+        const catText = e.categoria ? e.categoria.toUpperCase() : "BENJAMI";
+        return `<div class="bg-slate-950 p-2.5 rounded-xl border border-slate-850 flex justify-between items-center text-[11px]"><div><div class="font-bold text-white mb-0.5">${e.nom} <span class="text-[9px] bg-slate-900 border border-slate-800 text-indigo-400 px-1.5 py-0.2 rounded font-mono ml-1.5">${catText}</span></div><div class="text-slate-400 text-[10px]">Accés: <span class="text-indigo-400 font-mono">${creds.email}</span> | Clau: <span class="text-slate-500 font-mono">${creds.pass}</span></div></div><button onclick="eliminarEquipDelSistema('${e.id}')" class="text-slate-500 hover:text-rose-400 p-1 cursor-pointer"><i class="fas fa-trash-alt"></i></button></div>`;
     }).join('');
 }
 
