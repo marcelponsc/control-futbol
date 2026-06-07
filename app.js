@@ -3,13 +3,11 @@
 // ==========================================================================
 let CONFIG_CLUB = JSON.parse(localStorage.getItem('fc_config_multi')) || { nomClub: "INSTITUT LES CORTS" };
 
-// Llista d'equips dinàmica (si no n'hi ha, en fiquem dos de mostra per defecte)
 let LLISTA_EQUIPS = JSON.parse(localStorage.getItem('fc_equips_multi')) || [
     { id: "1eso-a", nom: "1r ESO - Grup A" }, 
     { id: "1eso-b", nom: "1r ESO - Grup B" }
 ];
 
-// Credencials dinàmiques d'usuaris (si no n'hi ha, creem la base inicial)
 let USUARIS_CREDENTIALS = JSON.parse(localStorage.getItem('fc_usuaris_multi')) || [
     { email: "coordinador@club.com", pass: "1234", rol: "coordinador", equip_id: null },
     { email: "entrenadorA@club.com", pass: "1234", rol: "entrenador", equip_id: "1eso-a" },
@@ -28,7 +26,6 @@ let idSessioActivaAssistència = "";
 let mapPosicionsActuals = {}; 
 let llistaSubstitucionsTmp = [];
 
-// ESTRUCTURA DE POSICIONS PER A FUTBOL 7 ESCOLAR
 const CONFIG_SISTEMES = {
     "1-2-3-1": [
         { id: "por", nom: "Porter/a", x: 50, y: 88 },
@@ -51,14 +48,9 @@ const CONFIG_SISTEMES = {
 };
 
 // ==========================================================================
-// 1.B CONFIGURACIÓ DE GOOGLE FIREBASE INTERNA (Ancoratge de seguretat)
+// 1.B CONFIGURACIÓ DE GOOGLE FIREBASE INTERNA
 // ==========================================================================
-const firebaseConfig = {
-    apiKey: "AQUI_VA_LA_TEVA_API_KEY",
-    authDomain: "EL_TEU_PROJECTE.firebaseapp.com",
-    projectId: "EL_TEU_PROJECTE",
-    storageBucket: "EL_TEU_PROJECTE.appspot.com"
-};
+const firebaseConfig = { apiKey: "AQUI_VA_LA_TEVA_API_KEY", authDomain: "EL_TEU_PROJECTE.firebaseapp.com", projectId: "EL_TEU_PROJECTE", storageBucket: "EL_TEU_PROJECTE.appspot.com" };
 let db = null; let storage = null;
 if (typeof firebase !== 'undefined' && firebaseConfig.apiKey !== "AQUI_VA_LA_TEVA_API_KEY") {
     try { firebase.initializeApp(firebaseConfig); db = firebase.firestore(); storage = firebase.storage(); } catch (e) {}
@@ -71,7 +63,7 @@ function executarLoginSimulat() {
     const email = document.getElementById('login-email').value.trim();
     const pass = document.getElementById('login-password').value;
     const u = USUARIS_CREDENTIALS.find(x => x.email.toLowerCase() === email.toLowerCase() && x.pass === pass);
-    if (!u) { alert("Credencials incorrectes o l'equip no existeix."); return; }
+    if (!u) { alert("Credencials incorrectes."); return; }
     
     USUARI_ACTIU = u;
     if (USUARI_ACTIU.rol === 'coordinador') {
@@ -310,7 +302,7 @@ function tancarModalJugador() { document.getElementById('modal-jugador').classLi
 function tancarFitxaJugador() { document.getElementById('modal-fitxa-jugador').classList.add('seccion-oculta'); }
 
 // ==========================================
-// 7. ACTES DE PARTIT I ELIMINACIÓ DE LLIGUES
+// 7. ACTES DE PARTIT I HISTORIAL
 // ==========================================
 function crearPartidoRapido() {
     const r = document.getElementById('partido-rival').value.trim(); if(!r) return;
@@ -327,7 +319,7 @@ function renderitzarPartits() {
             <div><b class="text-white">vs ${p.rival}</b> (${p.fecha || 'S/D'})</div>
             <div class="flex items-center space-x-2">
                 <button onclick="obrirGestioAvançadaPartit('${p.id}')" class="bg-indigo-600 text-white font-bold px-3 py-1.5 rounded-lg cursor-pointer">Obrir Acta</button>
-                <button onclick="if(confirm('Vols eliminar aquesta acta de partit? Es perdran tots els minuts i gols guardats.')) { DB_PARTITS = DB_PARTITS.filter(x => x.id !== '${p.id}'); localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS)); renderitzarPartits(); }" class="text-slate-500 hover:text-rose-400 p-2 cursor-pointer transition">
+                <button onclick="if(confirm('Vols eliminar aquesta acta?')) { DB_PARTITS = DB_PARTITS.filter(x => x.id !== '${p.id}'); localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS)); renderitzarPartits(); }" class="text-slate-500 hover:text-rose-400 p-2 cursor-pointer transition">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             </div>
@@ -366,7 +358,7 @@ function renderitzarLlistaConvocatoriaActa() {
                     <span class="text-white font-medium truncate">#${j.dorsal || '0'} ${j.nombre.split(' ')[0]}</span>
                 </div>
                 <div class="flex items-center space-x-1.5 shrink-0 ${estaConvocat ? '' : 'invisible'}">
-                    <div class="border rounded px-1.5 py-0.5 font-mono text-[10px] text-teal-400 bg-teal-950/20" id="badge-minuts-${j.id}">${c ? c.minuts : 0} min</div>
+                    <div class="border rounded px-1.5 py-0.5 font-mono text-[10px] text-teal-400 bg-teal-950/20" id="badge-minuts-${j.id}">0 min</div>
                     <span class="text-[11px]">⚽</span>
                     <input type="number" id="num-gols-${j.id}" value="${c ? c.golsMarcats : 0}" min="0" oninput="actualitzarGolsConvocat('${j.id}', this.value)" class="w-8 bg-slate-950 border border-slate-800 text-center text-white rounded font-mono p-0.5 focus:outline-none">
                 </div>
@@ -396,8 +388,7 @@ function recalcularMarcadorsTotalsAutomàtics() {
 }
 
 function guardarValoracioTextualDirecta(txt) {
-    const p = DB_PARTITS.find(x => x.id === partitIdActualGestio);
-    if(p) { p.valoracio = txt; localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS)); }
+    const p = DB_PARTITS.find(x => x.id === partitIdActualGestio); if(p) { p.valoracio = txt; localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS)); }
 }
 
 // ==========================================
@@ -444,12 +435,12 @@ function assignarJugadorAPosicioTactica(posicionId, jugadorId) {
     dibuixarCampTactics(); calcularMinutsAutomaticament();
 }
 
-// ==========================================
-// 9. CÀLCUL DE ROTACIONS I CRONOMETRATGE
-// ==========================================
+// ==========================================================================
+// 9. CÀLCUL CRONOLÒGIC DE ROTACIONS I MINUTS DE JOC ESCOLARS (CORREGIT)
+// ==========================================================================
 function seleccionarQuartFitxa(q) {
     document.getElementById('cambio-quarto-actiu').value = q;
-    ['2', '3', '4', 'int4'].forEach(s => { const b = document.getElementById(`btn-q-${s}`); if(b) b.className = (s === q) ? "py-1 bg-teal-600 text-white font-mono font-bold text-xs rounded border border-teal-500 shadow-sm cursor-pointer" : "py-1 bg-slate-800 text-slate-400 font-mono font-bold text-xs rounded border border-slate-700"; });
+    ['2', '3', '4', 'int4'].forEach(s => { const b = document.getElementById(`btn-q-${s}`); if(b) b.className = (s === q) ? "py-1 bg-teal-600 text-white font-mono font-bold text-[11px] rounded border border-teal-500 shadow-sm cursor-pointer" : "py-1 bg-slate-800 text-slate-400 font-mono font-bold text-[11px] rounded border border-slate-700 cursor-pointer"; });
     if(q === 'int4') document.getElementById('wrapper-minuto-q4').classList.remove('seccion-oculta'); else document.getElementById('wrapper-minuto-q4').classList.add('seccion-oculta');
 }
 
@@ -463,7 +454,6 @@ function afegirSubstitucioCronologica() {
     const q = document.getElementById('cambio-quarto-actiu').value; const sId = document.getElementById('cambio-sale-select').value; const eId = document.getElementById('cambio-entra-select').value;
     if(!sId || !eId || sId === eId) { alert("Tria dos alumnes diferents."); return; }
     
-    // FORMAT DE TEXT EVOLUTIU DEMANAT: Q1 -> Q2, Q2 -> Q3, Q3 -> Q4
     let etiquetaFormatada = q === '2' ? "Q1 ➔ Q2" : q === '3' ? "Q2 ➔ Q3" : q === '4' ? "Q3 ➔ Q4" : `Min ${document.getElementById('cambio-minuto-real').value}'`;
     const jS = DB_JUGADORS.find(x => x.id === sId); const jE = DB_JUGADORS.find(x => x.id === eId);
     
@@ -479,23 +469,57 @@ function renderitzarHistorialSubstitucionsVisual() {
 
 function calcularMinutsAutomaticament() {
     const p = DB_PARTITS.find(x => x.id === partitIdActualGestio); if(!p) return;
-    p.convocats.forEach(c => {
-        let esTitularPrimerQuart = Object.values(mapPosicionsActuals).includes(c.jugadorId);
-        let minsBase = esTitularPrimerQuart ? 12 : 0; 
+    
+    // Mapeig inicial: fiquem tots els convocats a 0 minuts
+    let tempsJugador = {};
+    p.convocats.forEach(c => { tempsJugador[c.jugadorId] = 0; });
+
+    // Llista dinàmica de qui hi ha al camp en cada bloc de temps
+    let enCampActuals = Object.values(mapPosicionsActuals).filter(id => id !== "");
+
+    // Simulem minut a minut els 48 minuts del partit escolar (4 quarts de 12 min)
+    for (let minut = 1; minut <= 48; minut++) {
         
+        // Càlcul de quins quarts arrenquen en aquest minut
+        let saltDeQuart = "";
+        if (minut === 13) saltDeQuart = "2"; // Inici del Q2
+        if (minut === 25) saltDeQuart = "3"; // Inici del Q3
+        if (minut === 37) saltDeQuart = "4"; // Inici del Q4
+
+        // Si estem a l'inici d'un quart, apliquem els canvis d'estructura en bloc
+        if (saltDeQuart !== "") {
+            llistaSubstitucionsTmp.forEach(sub => {
+                if (sub.quarto === saltDeQuart) {
+                    enCampActuals = enCampActuals.filter(id => id !== sub.sale);
+                    if (!enCampActuals.includes(sub.entra)) enCampActuals.push(sub.entra);
+                }
+            });
+        }
+
+        // Apliquem canvis puntuals de minut discret (Ex: minut 42)
         llistaSubstitucionsTmp.forEach(sub => {
-            if(sub.sale === c.jugadorId) minsBase -= 4; 
-            if(sub.entra === c.jugadorId) minsBase += 12; 
+            if (sub.quarto === 'int4') {
+                let mCanvi = parseInt(document.getElementById('cambio-minuto-real')?.value) || 42;
+                if (minut === mCanvi) {
+                    enCampActuals = enCampActuals.filter(id => id !== sub.sale);
+                    if (!enCampActuals.includes(sub.entra)) enCampActuals.push(sub.entra);
+                }
+            }
         });
-        c.minuts = Math.max(0, Math.min(48, minsBase));
-        const badge = document.getElementById(`badge-minuts-${c.jugadorId}`); if(badge) badge.innerText = `${c.minuts} min`;
+
+        // Sumem 1 minut de joc a tots els jugadors que estan actius a la llista de camp
+        enCampActuals.forEach(id => {
+            if (tempsJugador[id] !== undefined) tempsJugador[id]++;
+        });
+    }
+
+    // Actualitzem les caixes visuals de l'acta i desem el resultat permanent
+    p.convocats.forEach(c => {
+        c.minuts = tempsJugador[c.jugadorId] || 0;
+        const badge = document.getElementById(`badge-minuts-${c.jugadorId}`);
+        if(badge) badge.innerText = `${c.minuts} min`;
     });
     localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS));
-}
-
-function canviarGolsRivalDirecte(v) {
-    const p = DB_PARTITS.find(x => x.id === partitIdActualGestio);
-    if(p) { p.golsRival = parseInt(v) || 0; localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS)); }
 }
 
 // ==========================================
@@ -526,7 +550,7 @@ function calcularIAnalisarEstadistiquesGlobals() {
 }
 
 // ==========================================
-// 11. PANEL GESTIÓ DINÀMICA D'EQUIPS (COORDINADOR)
+// 11. PANEL GESTIÓ DINÀMICA D'EQUIPS
 // ==========================================
 function actualitzarConfiguracioEntitat() {
     const nouNomClub = document.getElementById('cfg-nom-club').value.trim(); if (!nouNomClub) return;
@@ -565,6 +589,9 @@ function eliminarEquipDelSistema(idEquip) {
     actualitzarSelectorFiltreCoordinadorDinamit(); canviarEquipActiuGeneral(); renderitzarLlistaEquipsConfiguracio();
 }
 
+// ==========================================
+// 12. INICIALITZACIÓ AUTOMÀTICA
+// ==========================================
 setTimeout(() => {
     const e = document.getElementById('login-email'); if(e) { e.value = "coordinador@club.com"; executarLoginSimulat(); }
 }, 300);
