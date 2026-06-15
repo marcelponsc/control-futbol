@@ -336,9 +336,6 @@ function guardarJugador() {
     localStorage.setItem('fc_jugadors_multi', JSON.stringify(DB_JUGADORS)); tancarModalJugador(); renderitzarPlantilla(); 
 }
 
-// ==========================================
-// 6.B FITXA INDIVIDUAL DE CONTACTE
-// ==========================================
 function obrirFitxaJugador(id) {
     const p = DB_JUGADORS.find(x => x.id === id); if(!p) return;
     document.getElementById('modal-fitxa-jugador').classList.remove('seccion-oculta');
@@ -363,7 +360,7 @@ function tancarModalJugador() { document.getElementById('modal-jugador').classLi
 function tancarFitxaJugador() { document.getElementById('modal-fitxa-jugador').classList.add('seccion-oculta'); }
 
 // ==========================================
-// 7. ACTES DE PARTIT I HISTORIAL
+// 7. GESTIÓ D'ACTES DE PARTIT
 // ==========================================
 function crearPartidoRapido() {
     const r = document.getElementById('partido-rival').value.trim(); if(!r) return;
@@ -399,11 +396,9 @@ function obrirGestioAvançadaPartit(id) {
     document.getElementById('det-partido-info').innerText = `${p.campo} | ${p.fecha} | ${p.hora}h [Cat: ${eqActiu.categoria.toUpperCase()}]`;
     document.getElementById('acta-valoracion').value = p.valoracio || ""; 
     
-    // NOU: Carregar els gols del rival directament dins del quadre d'escriptura manual
     if(document.getElementById('acta-gols-rival-manual-input')) {
         document.getElementById('acta-gols-rival-manual-input').value = p.golsRival || 0;
     }
-    
     document.getElementById('partido-sistema-joc').value = p.sistema || "1-2-3-1";
     
     mapPosicionsActuals = p.posicionsCamp || {}; llistaSubstitucionsTmp = p.subs || [];
@@ -457,13 +452,9 @@ function recalcularMarcadorsTotalsAutomàtics() {
     document.getElementById('acta-gols-nostres').innerText = n;
 }
 
-// NOU: Desar a la memòria a l'acte el número manual que escriguis als gols del rival
 function canviarGolsRivalDirecte(valor) {
     const p = DB_PARTITS.find(x => x.id === partitIdActualGestio);
-    if (p) { 
-        p.golsRival = parseInt(valor) || 0; 
-        localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS)); 
-    }
+    if (p) { p.golsRival = parseInt(valor) || 0; localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS)); }
 }
 
 function guardarValoracioTextualDirecta(txt) {
@@ -514,9 +505,9 @@ function assignarJugadorAPosicioTactica(posicionId, jugadorId) {
     dibuixarCampTactics(); calcularMinutsAutomaticament();
 }
 
-// ==========================================================================
-// 9. CÀLCUL DINÀMIC DE MINUTS ADAPTAT A LA CATEGORIA
-// ==========================================================================
+// ==========================================
+// 9. CÀLCUL DINÀMIC DE ROTACIONS I MINUTS
+// ==========================================
 function seleccionarQuartFitxa(q) {
     document.getElementById('cambio-quarto-actiu').value = q;
     ['2', '3', '4', 'int4'].forEach(s => { const b = document.getElementById(`btn-q-${s}`); if(b) b.className = (s === q) ? "py-1 bg-teal-600 text-white font-mono font-bold text-[11px] rounded border border-teal-500 shadow-sm cursor-pointer" : "py-1 bg-slate-800 text-slate-400 font-mono font-bold text-[11px] rounded border border-slate-700 cursor-pointer"; });
@@ -596,11 +587,54 @@ function calcularMinutsAutomaticament() {
     localStorage.setItem('fc_partits_multi', JSON.stringify(DB_PARTITS));
 }
 
-// ==========================================
-// 10. PANEL D'ESTADÍSTIQUES TOTALS
-// ==========================================
+// ==========================================================================
+// 10. PANEL D'ESTADÍSTIQUES TOTALS DUALS (SESSIONS ASSISTÈNCIA + PARTITS MINUTS)
+// ==========================================================================
 function calcularIAnalisarEstadistiquesGlobals() {
-    const partits = DB_PARTITS.filter(x => x.equip_id === EQUIP_ACTIU_ID); const jugadors = DB_JUGADORS.filter(x => x.equip_id === EQUIP_ACTIU_ID);
+    const partits = DB_PARTITS.filter(x => x.equip_id === EQUIP_ACTIU_ID); 
+    const jugadors = DB_JUGADORS.filter(x => x.equip_id === EQUIP_ACTIU_ID);
+    const sessions = DB_ENTRENAMENTS.filter(x => x.equip_id === EQUIP_ACTIU_ID);
+
+    // Actualitzar comptador global de sessions
+    if(document.getElementById('stat-total-sessions-actives-badge')) {
+        document.getElementById('stat-total-sessions-actives-badge').innerText = `${sessions.length} lliçons / sessions registrades`;
+    }
+
+    // --- BLOC A: INTEGRACIÓ ASSISTÈNCIA SESSIONS ---
+    let asisMap = {};
+    jugadors.forEach(j => { asisMap[j.id] = { P: 0, A: 0, J: 0 }; });
+
+    sessions.forEach(s => {
+        if(s.asistencia) {
+            Object.keys(s.asistencia).forEach(jId => {
+                if(asisMap[jId]) {
+                    let estat = s.asistencia[jId]; // "P", "A" o "J"
+                    if(asisMap[jId][estat] !== undefined) asisMap[jId][estat]++;
+                }
+            });
+        }
+    });
+
+    const tbodyAsistencia = document.getElementById('stat-tabla-asistencia-entrenamientos');
+    if(tbodyAsistencia) {
+        tbodyAsistencia.innerHTML = jugadors.map(j => {
+            let p = asisMap[j.id].P; let a = asisMap[j.id].A; let fnJ = asisMap[j.id].J;
+            let totalSess = p + a + fnJ;
+            let percentatgeAsis = totalSess > 0 ? ((p / totalSess) * 100).toFixed(0) : "0";
+
+            return `
+                <tr class="border-b border-slate-850 text-center text-xs hover:bg-slate-900/40">
+                    <td class="p-2.5 text-left font-semibold text-white pl-4">#${j.dorsal || '0'} - ${j.nombre}</td>
+                    <td class="text-emerald-400 font-bold font-mono">${p}</td>
+                    <td class="text-rose-400 font-bold font-mono">${a}</td>
+                    <td class="text-amber-500 font-bold font-mono">${fnJ}</td>
+                    <td class="text-slate-400 font-mono">${totalSess}</td>
+                    <td class="p-2.5 text-right pr-6 font-black text-teal-400 font-mono">${percentatgeAsis}%</td>
+                </tr>`;
+        }).join('');
+    }
+
+    // --- BLOC B: RENDIMENT I MINUTS PARTITS ---
     let favor = 0; let contra = 0; let guanyats = 0; let empatats = 0; let perduts = 0;
     let mConvocat = {}; let mMinutsTotals = {}; let mGols = {};
     jugadors.forEach(j => { mConvocat[j.id] = 0; mMinutsTotals[j.id] = 0; mGols[j.id] = 0; });
@@ -622,13 +656,12 @@ function calcularIAnalisarEstadistiquesGlobals() {
         const eqActiu = LLISTA_EQUIPS.find(x => x.id === EQUIP_ACTIU_ID) || { categoria: "benjami" };
         let totalMaxPartit = eqActiu.categoria === "prebenjami" ? 40 : eqActiu.categoria === "alevi" ? 60 : 48;
         let percentatgeMinuts = partitsConvocat > 0 ? ((minutsTotals / (partitsConvocat * totalMaxPartit)) * 100).toFixed(0) : "0";
-        
-        return `<tr class="border-b border-slate-850 text-center text-xs hover:bg-slate-900/40"><td class="p-2.5 text-left font-semibold text-white pl-4">#${j.dorsal || '0'} - ${j.nombre}</td><td>${partitsConvocat}</td><td class="text-amber-500 font-bold">${partitsConvocat > 0 ? Math.round(partitsConvocat*0.6) : 0}</td><td class="text-teal-400 font-bold">${partitsConvocat > 0 ? Math.round(partitsConvocat*0.4) : 0}</td><td class="text-indigo-400 font-bold">${minutsTotals} min</td><td>${minutsPerPartitConvocat} m</td><td class="text-sky-400 font-black">${percentatgeMinuts}%</td><td class="text-emerald-400 font-black">${mGols[j.id] || 0}</td></tr>`;
+        return `<tr class="border-b border-slate-850 text-center text-xs hover:bg-slate-900/40"><td class="p-2.5 text-left font-semibold text-white pl-4">#${j.dorsal || '0'} - ${j.nombre}</td><td>${partitsConvocat}</td><td class="text-amber-500 font-bold font-mono">${partitsConvocat > 0 ? Math.round(partitsConvocat*0.6) : 0}</td><td class="text-teal-400 font-bold font-mono">${partitsConvocat > 0 ? Math.round(partitsConvocat*0.4) : 0}</td><td class="text-indigo-400 font-bold font-mono">${minutsTotals} min</td><td class="font-mono">${minutsPerPartitConvocat} m</td><td class="text-sky-400 font-black font-mono">${percentatgeMinuts}%</td><td class="text-emerald-400 font-black font-mono">${mGols[j.id] || 0}</td></tr>`;
     }).join('');
 }
 
 // ==========================================
-// 11. PANEL GESTIÓ DINÀMICA D'EQUIPS (COORDINADOR)
+// 11. PANEL GESTIÓ DINÀMICA D'EQUIPS
 // ==========================================
 function actualitzarConfiguracioEntitat() {
     const nouNomClub = document.getElementById('cfg-nom-club').value.trim(); if (!nouNomClub) return;
@@ -655,7 +688,6 @@ function crearEquipIDosierDinamic() {
     document.getElementById('cfg-nou-equip-nom').value = ""; 
     document.getElementById('cfg-nou-equip-email').value = ""; 
     document.getElementById('cfg-nou-equip-pass').value = "";
-    
     alert(`Equip "${nomEquip}" [${categoriaEquip.toUpperCase()}] donat d'alta!`); 
     actualitzarSelectorFiltreCoordinadorDinamit(); renderitzarLlistaEquipsConfiguracio();
 }
