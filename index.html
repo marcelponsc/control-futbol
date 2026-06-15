@@ -54,7 +54,7 @@
                 <p class="text-[10px] text-slate-500 leading-normal">
                     <b>Credencials del sistema:</b><br>
                     Coordinador global: <span class="text-slate-400 font-mono">coordinador@club.com</span> (Clau: 1234)<br>
-                    <span class="text-slate-500">Els nous comptes de professors es creen des de la pestanya  Configuració.</span>
+                    <span class="text-slate-500">Els nous grups es creen des de la pestanya Configuració.</span>
                 </p>
             </div>
         </div>
@@ -268,16 +268,14 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-                    
                     <div class="lg:col-span-5 space-y-4">
-                        
                         <div class="space-y-2.5">
                             <div class="flex justify-between items-center bg-slate-900/60 px-3 py-2 rounded-xl border border-slate-850">
                                 <span class="font-black text-white text-xs uppercase tracking-wider"><i class="fas fa-clipboard-check text-indigo-400 mr-1.5"></i>Alumnat Convocat</span>
                                 <div class="flex items-center space-x-2 font-mono text-xs font-black">
                                     <span class="text-indigo-400 bg-slate-950 border border-slate-800 px-2 py-0.5 rounded shadow-sm" id="acta-gols-nostres">0</span>
                                     <span class="text-slate-600">-</span>
-                                    <input type="number" id="acta-gols-rival-manual-input" value="0" min="0" oninput="canviarGolsRivalDirecte(this.value)" class="w-10 bg-slate-950 border border-slate-800 text-center text-rose-400 font-bold px-1.5 py-0.5 rounded shadow-sm focus:outline-none focus:border-rose-900 font-mono">
+                                    <input type="number" id="acta-gols-rival-manual-input" value="0" min="0" oninput="canviarGolsRivalDirecte(this.value)" class="w-10 bg-slate-950 border border-slate-800 text-center text-rose-400 font-bold px-1.5 py-0.5 rounded shadow-sm focus:outline-none font-mono text-xs">
                                 </div>
                             </div>
                             <div id="lista-convocatoria-check" class="space-y-1.5 max-h-[240px] overflow-y-auto pr-1"></div>
@@ -288,19 +286,16 @@
                                 <h3 class="font-black text-white text-xs uppercase tracking-wider"><i class="fas fa-history text-teal-400 mr-1.5"></i>Gestió de Canvis Estructurada</h3>
                                 <input type="hidden" id="cambio-quarto-actiu" value="2">
                             </div>
-                            
                             <div class="grid grid-cols-4 gap-1">
                                 <button id="btn-q-2" onclick="seleccionarQuartFitxa('2')" class="py-1 bg-teal-600 text-white font-mono font-bold text-[11px] rounded border border-teal-500 shadow-sm cursor-pointer">Q1➔Q2</button>
                                 <button id="btn-q-3" onclick="seleccionarQuartFitxa('3')" class="py-1 bg-slate-800 text-slate-400 font-mono font-bold text-[11px] rounded border border-slate-700 cursor-pointer">Q2➔Q3</button>
                                 <button id="btn-q-4" onclick="seleccionarQuartFitxa('4')" class="py-1 bg-slate-800 text-slate-400 font-mono font-bold text-[11px] rounded border border-slate-700 cursor-pointer">Q3➔Q4</button>
                                 <button id="btn-q-int4" onclick="seleccionarQuartFitxa('int4')" class="py-1 bg-slate-800 text-slate-400 font-mono font-bold text-[11px] rounded border border-slate-700 cursor-pointer">Min</button>
                             </div>
-                            
                             <div id="wrapper-minuto-q4" class="seccion-oculta bg-slate-950 p-2 border border-slate-850 rounded-xl flex items-center justify-between text-xs">
                                 <span class="text-slate-400 font-medium">Especifica el Minut (<span id="cfg-text-limit-minuts">1-48</span>):</span>
                                 <input type="number" id="cambio-minuto-real" value="42" min="1" max="60" class="w-12 bg-slate-900 border border-slate-800 rounded font-mono p-0.5 text-center text-white focus:outline-none">
                             </div>
-                            
                             <div class="bg-slate-950 p-2 border border-slate-850 rounded-xl grid grid-cols-2 gap-2 text-xs">
                                 <div>
                                     <label class="block text-slate-500 font-bold text-[10px] uppercase mb-0.5">Surt del Camp ❌</label>
@@ -340,21 +335,62 @@
                 </div>
             </section>
 
-            <section id="seccion-estadisticas" class="seccion-oculta space-y-4">
+            <section id="seccion-estadisticas" class="seccion-oculta space-y-6">
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-center"><span class="block text-slate-500 text-[10px] uppercase tracking-wider font-bold">Actes registrades</span><b id="stat-total-encontres" class="text-xl text-white font-black">0</b></div>
                     <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-center"><span class="block text-slate-500 text-[10px] uppercase tracking-wider font-bold">Gols favor</span><b id="stat-gols-favor" class="text-xl text-emerald-400 font-black">0</b></div>
                     <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-center"><span class="block text-slate-500 text-[10px] uppercase tracking-wider font-bold">Gols contra</span><b id="stat-gols-contra" class="text-xl text-rose-400 font-black">0</b></div>
                     <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-center"><span class="block text-slate-500 text-[10px] uppercase tracking-wider font-bold">Balanç (G/E/P)</span><div class="text-sm font-mono font-bold mt-1 text-indigo-400"><span id="stat-partidos-ganados">0</span> / <span id="stat-partidos-empatados">0</span> / <span id="stat-partidos-perdidos">0</span></div></div>
                 </div>
+
                 <div class="overflow-hidden bg-slate-900 border border-slate-850 rounded-2xl shadow-sm">
-                    <div class="bg-slate-950 p-3 border-b border-slate-850"><h3 class="font-black text-white text-xs uppercase tracking-wider"><i class="fas fa-chart-line text-indigo-400 mr-1.5"></i>Minuts Individuals Acumulats</h3></div>
-                    <div class="overflow-x-auto"><table class="w-full text-xs"><thead><tr class="bg-slate-950/40 border-b border-slate-850 text-[10px] text-slate-400 font-bold uppercase tracking-wider text-center"><th class="p-2.5 text-left pl-4">Alumne</th><th>Partits Convocat</th><th>Titular (Q1)</th><th>Suplent</th><th>Minuts Totals</th><th>Mitjana min/partit</th><th>% Minuts jugats</th><th>Gols anotats</th></tr></thead><tbody id="stat-tabla-completa-jugadores"></tbody></table></div>
+                    <div class="bg-slate-950 p-3 border-b border-slate-850 flex justify-between items-center">
+                        <h3 class="font-black text-white text-xs uppercase tracking-wider flex items-center"><i class="fas fa-calendar-check text-teal-400 mr-2"></i>Rendiment i Assistència a l'Aula / Sessions</h3>
+                        <span id="stat-total-sessions-actives-badge" class="text-[10px] bg-slate-900 border border-slate-800 text-teal-400 font-mono px-2 py-0.5 rounded">0 sessions fetes</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs">
+                            <thead>
+                                <tr class="bg-slate-950/40 border-b border-slate-850 text-[10px] text-slate-400 font-bold uppercase tracking-wider text-center">
+                                    <th class="p-2.5 text-left pl-4">Alumne</th>
+                                    <th class="p-2.5">Presents (P)</th>
+                                    <th class="p-2.5">Absents (A)</th>
+                                    <th class="p-2.5">Justificats (J)</th>
+                                    <th class="p-2.5">Total Convocatòries</th>
+                                    <th class="p-2.5 text-right pr-6">% Assistència Global</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stat-tabla-asistencia-entrenamientos"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="overflow-hidden bg-slate-900 border border-slate-850 rounded-2xl shadow-sm">
+                    <div class="bg-slate-950 p-3 border-b border-slate-850">
+                        <h3 class="font-black text-white text-xs uppercase tracking-wider flex items-center"><i class="fas fa-chart-line text-indigo-400 mr-2"></i>Rendiment Metròleg i Minuts de Joc (Actes Match)</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs">
+                            <thead>
+                                <tr class="bg-slate-950/40 border-b border-slate-850 text-[10px] text-slate-400 font-bold uppercase tracking-wider text-center">
+                                    <th class="p-2.5 text-left pl-4">Alumne</th>
+                                    <th>Partits Convocat</th>
+                                    <th>Estimació Titular</th>
+                                    <th>Estimació Suplent</th>
+                                    <th>Minuts Totals</th>
+                                    <th>Mitjana min/partit</th>
+                                    <th>% Minuts jugats</th>
+                                    <th>Gols anotats</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stat-tabla-completa-jugadores"></tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
             <section id="seccion-configuracion" class="seccion-oculta space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
                     <div class="flex items-center space-x-3 border-b border-slate-850 pb-3"><div class="w-8 h-8 bg-indigo-950 border border-indigo-800 rounded-lg flex items-center justify-center text-indigo-400"><i class="fas fa-school text-sm"></i></div><div><h3 class="text-sm font-black text-white">IDENTITAT DEL CENTRE</h3><p class="text-[11px] text-slate-500">Nom de la institució escolar</p></div></div>
                     <div class="space-y-3 text-xs">
                         <div><label class="block text-slate-400 font-medium mb-1">Nom de l'Institut</label><input type="text" id="cfg-nom-club" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:outline-none"></div>
@@ -380,7 +416,7 @@
                         </div>
                         <div><label class="block text-slate-400 mb-1">Email de l'Entrenador</label><input type="email" id="cfg-nou-equip-email" placeholder="entrenadorC@club.com" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs"></div>
                         <div><label class="block text-slate-400 mb-1">Contrasenya</label><input type="password" id="cfg-nou-equip-pass" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs"></div>
-                        <div class="md:col-span-4 pt-2"><button onclick="crearEquipIDosierDinamic()" class="bg-teal-600 text-white font-bold px-4 py-2 rounded-lg w-full text-xs cursor-pointer"><i class="fas fa-plus-circle mr-1"></i> Donar d'Alta Equip i Accés</button></div>
+                        <div class="md:col-span-4 pt-2"><button onclick="crearEquipIDosierDinamic()" class="bg-teal-600 text-white font-bold px-4 py-2 rounded-lg w-full text-xs cursor-pointer"><i class="fas fa-plus-circle mr-1"></i> Donar d'Alta Equip</button></div>
                     </div>
                     <div class="space-y-2 pt-2"><span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Equips / Grups Actius</span><div id="cfg-llista-equips-sistema" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div></div>
                 </div>
