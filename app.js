@@ -4,18 +4,17 @@
 const SUPABASE_URL = "https://bbjrgnwlmqnmbbkvttht.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_eIOPuAXQeciWFJYEn7-RIg_LtLWrk24"; 
 
-const supabase =  window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Variables de control locals
+// Variables de control locals amb dades per defecte de seguretat
 let CONFIG_CLUB = { nomClub: "INSTITUT LES CORTS" };
 let LLISTA_EQUIPS = [
-    { id: "1eso-a", nom: "1r ESO - Grup A", categoria: "benjami" }, 
-    { id: "1eso-b", nom: "1r ESO - Grup B", categoria: "benjami" }
+    { id: "eq-1", nom: "Aleví A", categoria: "alevi" }, 
+    { id: "eq-2", nom: "Benjamí A", categoria: "benjami" }
 ];
 let USUARIS_CREDENTIALS = [
     { email: "coordinador@club.com", pass: "1234", rol: "coordinador", equip_id: null },
-    { email: "entrenadorA@club.com", pass: "1234", rol: "entrenador", equip_id: "1eso-a" },
-    { email: "entrenadorB@club.com", pass: "1234", rol: "entrenador", equip_id: "1eso-b" }
+    { email: "entrenador@club.com", pass: "1234", rol: "entrenador", equip_id: "eq-1" }
 ];
 let DB_JUGADORS = []; let DB_EXERCICIS = []; let DB_ENTRENAMENTS = []; let DB_PARTITS = [];
 
@@ -50,17 +49,17 @@ async function descarregarDadesDelNuvol() {
     try {
         const { data, error } = await supabase.from('fc_multi_dades').select('dades').eq('id', 'dades_globals').single();
         if (error) throw error;
-        if (data && data.dades && Object.keys(data.dades).length > 0) {
+        if (data && data.dades) {
             const d = data.dades;
-            if(d.config_club) CONFIG_CLUB = d.config_club;
-            if(d.llista_equips) LLISTA_EQUIPS = d.llista_equips;
-            if(d.usuaris_credentials) USUARIS_CREDENTIALS = d.usuaris_credentials;
+            if (d.config_club && d.config_club.nomClub) CONFIG_CLUB = d.config_club;
+            if (d.llista_equips && d.llista_equips.length > 0) LLISTA_EQUIPS = d.llista_equips;
+            if (d.usuaris_credentials && d.usuaris_credentials.length > 0) USUARIS_CREDENTIALS = d.usuaris_credentials;
             DB_JUGADORS = d.db_jugadors || [];
             DB_EXERCICIS = d.db_exercicis || [];
             DB_ENTRENAMENTS = d.db_entrenaments || [];
             DB_PARTITS = d.db_partits || [];
         }
-    } catch (e) { console.error("Error descarregant dades:", e); }
+    } catch (e) { console.error("Avís descarregant dades (es faran servir valors base):", e); }
 }
 
 async function pujarDadesAlNuvol() {
@@ -324,7 +323,7 @@ async function desarAsistenciaSessióActual() {
         let est = "P"; if (document.getElementById(`btn-asis-int-${j.id}-A`)?.classList.contains('bg-rose-600')) est = "A"; if (document.getElementById(`btn-asis-int-${j.id}-J`)?.classList.contains('bg-amber-500')) est = "J";
         entreno.asistencia[j.id] = est;
     });
-    await pujarDadesAlNuvol(); alert("Sessió desada al núvol central!");
+    await pujarDadesAlNuvol(); alert("Assistència guardada!");
     cambiarPestana('entrenamientos'); renderitzarEntrenaments();
 }
 
@@ -434,7 +433,7 @@ async function commutarConvocatoria(jugadorId) {
     renderitzarLlistaConvocatoriaActa(); dibuixarCampTactics(); calcularMinutsAutomaticament(); actualitzarSelectorsDeCanvi(); recalcularMarcadorsTotalsAutomàtics();
 }
 
-async function updateGolsConvocat(jugadorId, valor) {
+async function actualitzarGolsConvocat(jugadorId, valor) {
     const p = DB_PARTITS.find(x => x.id === partitIdActualGestio); if(!p) return;
     const c = p.convocats.find(x => x.jugadorId === jugadorId);
     if (c) { c.golsMarcats = parseInt(valor) || 0; recalcularMarcadorsTotalsAutomàtics(); await pujarDadesAlNuvol(); }
@@ -482,7 +481,7 @@ function dibuixarCampTactics() {
 }
 
 async function assignarJugadorAPosicioTactica(posicionId, jugadorId) {
-    const p = DB_PARTITS.find(x => x.id === partitIdActualGestio); if(!p) return;
+    const p = DB_PARTITS.find(x => x.id === p.id); if(!p) return;
     if(jugadorId === "") delete mapPosicionsActuals[posicionId]; else mapPosicionsActuals[posicionId] = jugadorId;
     p.posicionsCamp = mapPosicionsActuals; await pujarDadesAlNuvol();
     dibuixarCampTactics(); calcularMinutsAutomaticament();
@@ -647,4 +646,4 @@ setTimeout(async () => {
     localStorage.clear(); 
     await descarregarDadesDelNuvol();
     const e = document.getElementById('login-email'); if(e) { e.value = "coordinador@club.com"; executarLoginSimulat(); }
-}, 400);
+}, 300);
