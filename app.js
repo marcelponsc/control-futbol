@@ -481,7 +481,7 @@ function dibuixarCampTactics() {
 }
 
 async function assignarJugadorAPosicioTactica(posicionId, jugadorId) {
-    const p = DB_PARTITS.find(x => x.id === p.id); if(!p) return;
+    const p = DB_PARTITS.find(x => x.id === partitIdActualGestio); if(!p) return;
     if(jugadorId === "") delete mapPosicionsActuals[posicionId]; else mapPosicionsActuals[posicionId] = jugadorId;
     p.posicionsCamp = mapPosicionsActuals; await pujarDadesAlNuvol();
     dibuixarCampTactics(); calcularMinutsAutomaticament();
@@ -646,4 +646,4 @@ setTimeout(async () => {
     localStorage.clear(); 
     await descarregarDadesDelNuvol();
     const e = document.getElementById('login-email'); if(e) { e.value = "coordinador@club.com"; executarLoginSimulat(); }
-}, 300);
+}, 400);
