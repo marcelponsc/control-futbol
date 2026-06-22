@@ -2,8 +2,7 @@
 // CONFIGURACIÓ DE SUPABASE - CONNECTEM L'APP AL NÚVOL CENTRAL
 // ==========================================================================
 const SUPABASE_URL = "https://bbjrgnwlmqnmbbkvttht.supabase.co";
-// ⚠️ ATENCIÓ: Enganxa la teva clau llarga 'anon' de Supabase a dins de les cometes de sota:
-const SUPABASE_ANON_KEY = "ENGANXA_AQUÍ_LA_TEVA_CLAU_ANON_LLARGA"; 
+const SUPABASE_ANON_KEY = "sb_publishable_eIOPuAXQeciWFJYEn7-RIg_LtLWrk24"; 
 
 const supabase =  window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -83,7 +82,7 @@ async function pujarDadesAlNuvol() {
 // 2. CONTROL D'ACCÉS (LOGIN / LOGOUT)
 // ==========================================
 async function executarLoginSimulat() {
-    await descarregarDadesDelNuvol(); // Ens assegurem de tenir l'última llista abans de validar
+    await descarregarDadesDelNuvol(); 
     const email = document.getElementById('login-email').value.trim();
     const pass = document.getElementById('login-password').value;
     const u = USUARIS_CREDENTIALS.find(x => x.email.toLowerCase() === email.toLowerCase() && x.pass === pass);
@@ -435,7 +434,7 @@ async function commutarConvocatoria(jugadorId) {
     renderitzarLlistaConvocatoriaActa(); dibuixarCampTactics(); calcularMinutsAutomaticament(); actualitzarSelectorsDeCanvi(); recalcularMarcadorsTotalsAutomàtics();
 }
 
-async function actualitzarGolsConvocat(jugadorId, valor) {
+async function updateGolsConvocat(jugadorId, valor) {
     const p = DB_PARTITS.find(x => x.id === partitIdActualGestio); if(!p) return;
     const c = p.convocats.find(x => x.jugadorId === jugadorId);
     if (c) { c.golsMarcats = parseInt(valor) || 0; recalcularMarcadorsTotalsAutomàtics(); await pujarDadesAlNuvol(); }
@@ -645,7 +644,6 @@ function renderitzarLlistaEquipsConfiguracio() {
 // 12. INICIALITZACIÓ AUTOMÀTICA AL NÚVOL
 // ==========================================
 setTimeout(async () => {
-    // Esborrem possibles incompatibilitats velles locals i descarreguem del núvol de Supabase directament
     localStorage.clear(); 
     await descarregarDadesDelNuvol();
     const e = document.getElementById('login-email'); if(e) { e.value = "coordinador@club.com"; executarLoginSimulat(); }
